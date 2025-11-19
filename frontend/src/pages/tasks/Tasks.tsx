@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button, Card, CardBody, Tag, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui';
+import PageTransition from '../../components/animations/PageTransition';
 
 const Tasks = () => {
   const [tasks] = useState([
@@ -43,7 +44,8 @@ const Tasks = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <PageTransition>
+      <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-semibold text-apple-gray-900">Tareas</h1>
@@ -91,8 +93,9 @@ const Tasks = () => {
             </TableBody>
           </Table>
         </CardBody>
-      </Card>
-    </div>
+        </Card>
+      </div>
+    </PageTransition>
   );
 };
 

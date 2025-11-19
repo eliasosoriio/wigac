@@ -1,10 +1,12 @@
 import { Card, CardBody, CardHeader } from '../../components/ui';
+import PageTransition from '../../components/animations/PageTransition';
 
 const Kanban = () => {
   const columns = ['Por Hacer', 'En Progreso', 'Completado'];
 
   return (
-    <div className="space-y-6">
+    <PageTransition>
+      <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-semibold text-apple-gray-900">Kanban</h1>
         <p className="text-apple-gray-600 mt-2">
@@ -27,6 +29,7 @@ const Kanban = () => {
         ))}
       </div>
     </div>
+    </PageTransition>
   );
 };
 

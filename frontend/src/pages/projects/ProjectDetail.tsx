@@ -1,11 +1,13 @@
 import { useParams } from 'react-router-dom';
 import { Card, CardBody, CardHeader } from '../../components/ui';
+import PageTransition from '../../components/animations/PageTransition';
 
 const ProjectDetail = () => {
   const { id } = useParams();
 
   return (
-    <div className="space-y-6">
+    <PageTransition>
+      <div className="space-y-6">
       <h1 className="text-3xl font-semibold text-apple-gray-900">
         Detalle del Proyecto {id}
       </h1>
@@ -19,8 +21,9 @@ const ProjectDetail = () => {
             Contenido del proyecto en desarrollo...
           </p>
         </CardBody>
-      </Card>
-    </div>
+        </Card>
+      </div>
+    </PageTransition>
   );
 };
 

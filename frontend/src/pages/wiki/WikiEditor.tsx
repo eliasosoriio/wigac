@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Save } from 'lucide-react';
 import { Button, Card, CardBody, Textarea, Input } from '../../components/ui';
+import PageTransition from '../../components/animations/PageTransition';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -10,7 +11,8 @@ const WikiEditor = () => {
   const [isPreview, setIsPreview] = useState(false);
 
   return (
-    <div className="space-y-6">
+    <PageTransition>
+      <div className="space-y-6">
       <div className="flex items-center justify-between">
         <Input
           value={title}
@@ -57,6 +59,7 @@ const WikiEditor = () => {
         </Card>
       </div>
     </div>
+    </PageTransition>
   );
 };
 

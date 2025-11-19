@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { Button, Input, Card, CardBody } from '../../components/ui';
 import { useAuthStore } from '../../store/authStore';
+import PageTransition from '../../components/animations/PageTransition';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -69,7 +70,8 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-apple-gray-50 to-apple-blue-50 p-4">
+    <PageTransition>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-apple-gray-50 to-apple-blue-50 p-4">
       <Card className="w-full max-w-md">
         <CardBody className="p-8">
           <div className="text-center mb-8">
@@ -145,6 +147,7 @@ const Register = () => {
         </CardBody>
       </Card>
     </div>
+    </PageTransition>
   );
 };
 

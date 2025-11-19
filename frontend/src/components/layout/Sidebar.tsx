@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
   FolderKanban,
@@ -43,23 +44,29 @@ const Sidebar = ({ onOpenProfile }: SidebarProps) => {
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-1">
-        {menuItems.map((item) => (
-          <NavLink
+        {menuItems.map((item, index) => (
+          <motion.div
             key={item.path}
-            to={item.path}
-            end={item.path === '/'}
-            className={({ isActive }) =>
-              clsx(
-                'flex items-center gap-3 px-4 py-3 rounded-apple transition-all duration-200',
-                isActive
-                  ? 'bg-apple-blue-500 text-white shadow-apple'
-                  : 'text-apple-gray-700 hover:bg-apple-gray-100'
-              )
-            }
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.05, duration: 0.2 }}
           >
-            <item.icon className="w-5 h-5" />
-            <span className="font-medium">{item.label}</span>
-          </NavLink>
+            <NavLink
+              to={item.path}
+              end={item.path === '/'}
+              className={({ isActive }) =>
+                clsx(
+                  'flex items-center gap-3 px-4 py-3 rounded-apple transition-all duration-200',
+                  isActive
+                    ? 'bg-apple-blue-500 text-white shadow-apple'
+                    : 'text-apple-gray-700 hover:bg-apple-gray-100'
+                )
+              }
+            >
+              <item.icon className="w-5 h-5" />
+              <span className="font-medium">{item.label}</span>
+            </NavLink>
+          </motion.div>
         ))}
       </nav>
 

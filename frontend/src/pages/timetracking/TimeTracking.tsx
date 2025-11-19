@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { Plus, Download } from 'lucide-react';
 import { Button, Card, CardBody, CardHeader } from '../../components/ui';
+import PageTransition from '../../components/animations/PageTransition';
 import { format } from 'date-fns';
 
 const TimeTracking = () => {
   const [selectedDate] = useState(new Date());
 
   return (
-    <div className="space-y-6">
+    <PageTransition>
+      <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-semibold text-apple-gray-900">
@@ -45,8 +47,9 @@ const TimeTracking = () => {
             </div>
           </div>
         </CardBody>
-      </Card>
-    </div>
+        </Card>
+      </div>
+    </PageTransition>
   );
 };
 

@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { useAuthStore } from './store/authStore';
 import Layout from './components/layout/Layout';
 import Login from './pages/auth/Login';
@@ -12,12 +13,13 @@ import TimeTracking from './pages/timetracking/TimeTracking';
 import Wiki from './pages/wiki/Wiki';
 import WikiEditor from './pages/wiki/WikiEditor';
 
-function App() {
+function AppRoutes() {
   const { isAuthenticated } = useAuthStore();
+  const location = useLocation();
 
   return (
-    <BrowserRouter>
-      <Routes>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
         <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
 
@@ -32,6 +34,14 @@ function App() {
           <Route path="wiki/:id" element={<WikiEditor />} />
         </Route>
       </Routes>
+    </AnimatePresence>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
     </BrowserRouter>
   );
 }

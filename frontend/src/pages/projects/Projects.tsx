@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button, Card, CardBody, Tag } from '../../components/ui';
+import PageTransition from '../../components/animations/PageTransition';
 
 const Projects = () => {
   const [projects] = useState([
@@ -25,7 +26,8 @@ const Projects = () => {
   ]);
 
   return (
-    <div className="space-y-6">
+    <PageTransition>
+      <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-semibold text-apple-gray-900">
@@ -84,8 +86,9 @@ const Projects = () => {
             </CardBody>
           </Card>
         ))}
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
 };
 

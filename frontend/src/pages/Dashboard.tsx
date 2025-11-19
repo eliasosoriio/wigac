@@ -1,5 +1,6 @@
 import { Card, CardBody, CardHeader } from '../components/ui';
 import { FolderKanban, CheckSquare, Clock, TrendingUp } from 'lucide-react';
+import PageTransition from '../components/animations/PageTransition';
 
 const Dashboard = () => {
   const stats = [
@@ -34,7 +35,8 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="space-y-8">
+    <PageTransition>
+      <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-semibold text-apple-gray-900">
           Dashboard
@@ -77,6 +79,7 @@ const Dashboard = () => {
         </CardBody>
       </Card>
     </div>
+    </PageTransition>
   );
 };
 

@@ -11,7 +11,11 @@ import {
 import { useAuthStore } from '../../store/authStore';
 import { clsx } from 'clsx';
 
-const Sidebar = () => {
+interface SidebarProps {
+  onOpenProfile: () => void;
+}
+
+const Sidebar = ({ onOpenProfile }: SidebarProps) => {
   const { logout, user } = useAuthStore();
 
   const menuItems = [
@@ -55,17 +59,20 @@ const Sidebar = () => {
 
       {/* User section */}
       <div className="p-4 border-t border-apple-gray-200">
-        <div className="flex items-center gap-3 px-4 py-3 mb-2">
+        <button
+          onClick={onOpenProfile}
+          className="w-full flex items-center gap-3 px-4 py-3 mb-2 rounded-apple hover:bg-apple-gray-100 transition-all duration-200 cursor-pointer"
+        >
           <div className="w-10 h-10 rounded-full bg-apple-blue-500 flex items-center justify-center text-white font-semibold">
             {user?.name.charAt(0).toUpperCase()}
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 text-left">
             <p className="text-sm font-medium text-apple-gray-900 truncate">
               {user?.name}
             </p>
             <p className="text-xs text-apple-gray-500 truncate">{user?.email}</p>
           </div>
-        </div>
+        </button>
         <button
           onClick={logout}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-apple text-apple-gray-700 hover:bg-apple-red-50 hover:text-apple-red-600 transition-all duration-200"

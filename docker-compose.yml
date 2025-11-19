@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: wigac_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: wigac_user
+      POSTGRES_PASSWORD: wigac_password
+      POSTGRES_DB: wigac_db
+    ports:
+      - "15432:5432"  # Puerto externo: 15432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - wigac_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wigac_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend (NestJS)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: wigac_backend
+    restart: always
+    ports:
+      - "8081:3001"  # Puerto externo: 8081
+    environment:
+      DATABASE_URL: postgresql://wigac_user:wigac_password@postgres:5432/wigac_db
+      JWT_SECRET: wigac_jwt_secret_2025_change_in_production_a1b2c3d4e5f6
+      JWT_REFRESH_SECRET: wigac_refresh_secret_2025_change_in_production_x7y8z9
+      JWT_EXPIRATION: 15m
+      JWT_REFRESH_EXPIRATION: 7d
+      PORT: 3001
+      NODE_ENV: production
+      EMAIL_HOST: smtp.gmail.com
+      EMAIL_PORT: 587
+      EMAIL_USER: your-email@gmail.com
+      EMAIL_PASS: your-app-password
+      EMAIL_FROM: noreply@wigac.com
+      FRONTEND_URL: http://localhost:8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - wigac_network
+    volumes:
+      - ./backend/uploads:/app/uploads
+
+  # Frontend (React + Vite)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8081/api
+    container_name: wigac_frontend
+    restart: always
+    ports:
+      - "8080:80"  # Puerto externo: 8080
+    depends_on:
+      - backend
+    networks:
+      - wigac_network
+
+volumes:
+  postgres_data:
+
+networks:
+  wigac_network:
+    driver: bridge

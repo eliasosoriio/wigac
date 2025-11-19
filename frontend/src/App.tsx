@@ -1,0 +1,37 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from './store/authStore';
+import Layout from './components/layout/Layout';
+import Login from './pages/auth/Login';
+import Dashboard from './pages/Dashboard';
+import Projects from './pages/projects/Projects';
+import ProjectDetail from './pages/projects/ProjectDetail';
+import Tasks from './pages/tasks/Tasks';
+import Kanban from './pages/kanban/Kanban';
+import TimeTracking from './pages/timetracking/TimeTracking';
+import Wiki from './pages/wiki/Wiki';
+import WikiEditor from './pages/wiki/WikiEditor';
+
+function App() {
+  const { isAuthenticated } = useAuthStore();
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
+
+        <Route path="/" element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}>
+          <Route index element={<Dashboard />} />
+          <Route path="projects" element={<Projects />} />
+          <Route path="projects/:id" element={<ProjectDetail />} />
+          <Route path="tasks" element={<Tasks />} />
+          <Route path="kanban" element={<Kanban />} />
+          <Route path="timetracking" element={<TimeTracking />} />
+          <Route path="wiki" element={<Wiki />} />
+          <Route path="wiki/:id" element={<WikiEditor />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;

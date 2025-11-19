@@ -1,0 +1,81 @@
+import { NavLink } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  FolderKanban,
+  CheckSquare,
+  Columns,
+  Clock,
+  BookText,
+  LogOut
+} from 'lucide-react';
+import { useAuthStore } from '../../store/authStore';
+import { clsx } from 'clsx';
+
+const Sidebar = () => {
+  const { logout, user } = useAuthStore();
+
+  const menuItems = [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+    { icon: FolderKanban, label: 'Proyectos', path: '/projects' },
+    { icon: CheckSquare, label: 'Tareas', path: '/tasks' },
+    { icon: Columns, label: 'Kanban', path: '/kanban' },
+    { icon: Clock, label: 'Time Tracking', path: '/timetracking' },
+    { icon: BookText, label: 'Wiki', path: '/wiki' },
+  ];
+
+  return (
+    <aside className="w-64 glass border-r border-apple-gray-200 flex flex-col">
+      {/* Logo */}
+      <div className="p-6 border-b border-apple-gray-200">
+        <h1 className="text-2xl font-semibold text-apple-gray-900">Wigac</h1>
+        <p className="text-sm text-apple-gray-500 mt-1">Project Management</p>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-1">
+        {menuItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            end={item.path === '/'}
+            className={({ isActive }) =>
+              clsx(
+                'flex items-center gap-3 px-4 py-3 rounded-apple transition-all duration-200',
+                isActive
+                  ? 'bg-apple-blue-500 text-white shadow-apple'
+                  : 'text-apple-gray-700 hover:bg-apple-gray-100'
+              )
+            }
+          >
+            <item.icon className="w-5 h-5" />
+            <span className="font-medium">{item.label}</span>
+          </NavLink>
+        ))}
+      </nav>
+
+      {/* User section */}
+      <div className="p-4 border-t border-apple-gray-200">
+        <div className="flex items-center gap-3 px-4 py-3 mb-2">
+          <div className="w-10 h-10 rounded-full bg-apple-blue-500 flex items-center justify-center text-white font-semibold">
+            {user?.name.charAt(0).toUpperCase()}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-apple-gray-900 truncate">
+              {user?.name}
+            </p>
+            <p className="text-xs text-apple-gray-500 truncate">{user?.email}</p>
+          </div>
+        </div>
+        <button
+          onClick={logout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-apple text-apple-gray-700 hover:bg-apple-red-50 hover:text-apple-red-600 transition-all duration-200"
+        >
+          <LogOut className="w-5 h-5" />
+          <span className="font-medium">Cerrar Sesión</span>
+        </button>
+      </div>
+    </aside>
+  );
+};
+
+export default Sidebar;

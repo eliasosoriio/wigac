@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock } from 'lucide-react';
 import { Button, Input, Card, CardBody } from '../../components/ui';
 import { useAuthStore } from '../../store/authStore';
+import axios from 'axios';
 import toast from 'react-hot-toast';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -17,24 +20,19 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await axios.post(`${API_URL}/auth/login`, {
+        email,
+        password
+      });
 
-      // Mock login
-      login(
-        {
-          id: '1',
-          email,
-          name: 'Usuario Demo',
-          role: 'admin',
-        },
-        'mock-token'
-      );
+      const { user, accessToken } = response.data;
+      login(user, accessToken);
 
       toast.success('¡Bienvenido!');
       navigate('/');
-    } catch (error) {
-      toast.error('Error al iniciar sesión');
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Error al iniciar sesión';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -84,6 +82,18 @@ const Login = () => {
               Iniciar Sesión
             </Button>
           </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-apple-gray-600 text-sm">
+              ¿No tienes cuenta?{' '}
+              <Link
+                to="/register"
+                className="text-apple-blue-600 hover:text-apple-blue-700 font-medium transition-colors"
+              >
+                Regístrate aquí
+              </Link>
+            </p>
+          </div>
         </CardBody>
       </Card>
     </div>

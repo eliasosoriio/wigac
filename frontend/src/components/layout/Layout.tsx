@@ -3,9 +3,12 @@ import { useState } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import ProfileModal from '../profile/ProfileModal';
+import ProjectModal from '../projects/ProjectModal';
+import { useProjectModalStore } from '../../store/projectModalStore';
 
 const Layout = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const { isOpen, project, closeModal, refreshProjects } = useProjectModalStore();
 
   return (
     <div className="flex h-screen bg-apple-gray-50 overflow-hidden">
@@ -21,6 +24,14 @@ const Layout = () => {
       <ProfileModal
         isOpen={showProfileModal}
         onClose={() => setShowProfileModal(false)}
+      />
+
+      {/* Project Modal - Rendered at app level */}
+      <ProjectModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        onSuccess={refreshProjects}
+        project={project}
       />
     </div>
   );

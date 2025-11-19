@@ -12,10 +12,13 @@ router.use(authenticate);
 router.get('/', async (req: AuthRequest, res) => {
   try {
     const { projects: projectRepository } = getRepositories();
-    const { userId } = req.query;
-    const where = userId ? { createdById: parseInt(userId as string) } : {};
+    const userId = req.user!.id;
 
-    const projects = await projectRepository.find({ where });
+    const projects = await projectRepository.find({
+      where: { createdById: userId },
+      relations: ['tasks'],
+      order: { createdAt: 'DESC' }
+    });
     res.json(projects);
   } catch (error) {
     console.error('Get projects error:', error);
@@ -24,12 +27,14 @@ router.get('/', async (req: AuthRequest, res) => {
 });
 
 // Get project by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req: AuthRequest, res) => {
   try {
     const { projects: projectRepository } = getRepositories();
     const { id } = req.params;
+    const userId = req.user!.id;
+
     const project = await projectRepository.findOne({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id), createdById: userId },
       relations: ['tasks', 'wikiPages']
     });
 
@@ -45,10 +50,11 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create project
-router.post('/', async (req, res) => {
+router.post('/', async (req: AuthRequest, res) => {
   try {
     const { projects: projectRepository } = getRepositories();
     const { name, description, status, color, startDate, endDate } = req.body;
+    const userId = req.user!.id;
 
     const project = projectRepository.create({
       name,
@@ -56,7 +62,8 @@ router.post('/', async (req, res) => {
       status: status || ProjectStatus.ACTIVE,
       color,
       startDate: startDate ? new Date(startDate) : undefined,
-      endDate: endDate ? new Date(endDate) : undefined
+      endDate: endDate ? new Date(endDate) : undefined,
+      createdById: userId
     });
 
     await projectRepository.save(project);
@@ -68,15 +75,19 @@ router.post('/', async (req, res) => {
 });
 
 // Update project
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req: AuthRequest, res) => {
   try {
     const { projects: projectRepository } = getRepositories();
     const { id } = req.params;
     const { name, description, status, color, startDate, endDate } = req.body;
+    const userId = req.user!.id;
 
-    const project = await projectRepository.findOne({ where: { id: parseInt(id) } });
+    const project = await projectRepository.findOne({
+      where: { id: parseInt(id), createdById: userId }
+    });
+
     if (!project) {
-      return res.status(404).json({ message: 'Project not found' });
+      return res.status(404).json({ message: 'Project not found or you do not have permission to edit it' });
     }
 
     if (name) project.name = name;
@@ -95,10 +106,20 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete project
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req: AuthRequest, res) => {
   try {
     const { projects: projectRepository } = getRepositories();
     const { id } = req.params;
+    const userId = req.user!.id;
+
+    const project = await projectRepository.findOne({
+      where: { id: parseInt(id), createdById: userId }
+    });
+
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found or you do not have permission to delete it' });
+    }
+
     await projectRepository.delete({ id: parseInt(id) });
     res.json({ message: 'Project deleted successfully' });
   } catch (error) {

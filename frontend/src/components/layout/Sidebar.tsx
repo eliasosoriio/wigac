@@ -30,10 +30,16 @@ const Sidebar = ({ onOpenProfile }: SidebarProps) => {
   return (
     <aside className="w-64 glass border-r border-apple-gray-200 flex flex-col">
       {/* Logo */}
-      <div className="p-6 border-b border-apple-gray-200">
-        <h1 className="text-2xl font-semibold text-apple-gray-900">Wigac</h1>
-        <p className="text-sm text-apple-gray-500 mt-1">Project Management</p>
-      </div>
+      <NavLink
+        to="/"
+        className="p-6 border-b border-apple-gray-200 flex items-center justify-center hover:bg-apple-gray-50 transition-colors"
+      >
+        <img
+          src="/logo.jpg"
+          alt="Wigac"
+          className="h-12 w-auto text-apple-gray-900"
+        />
+      </NavLink>
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-1">

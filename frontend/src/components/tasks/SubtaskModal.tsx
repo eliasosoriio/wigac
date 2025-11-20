@@ -130,31 +130,31 @@ export default function SubtaskModal({ isOpen, onClose, onSuccess, taskId, subta
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-white dark:bg-dark-card rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                <h2 className="text-2xl font-semibold text-gray-900">
+              <div className="sticky top-0 bg-white dark:bg-dark-card border-b border-gray-200 dark:border-dark-border px-6 py-4 flex items-center justify-between">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-apple-gray-100">
                   {subtask ? 'Editar Registro' : 'Nuevo Registro de Tiempo'}
                 </h2>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-dark-hover rounded-full transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5 text-gray-500 dark:text-apple-gray-400" />
                 </button>
               </div>
 
               <form onSubmit={handleSubmit} className="p-6 space-y-6">
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                  <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
                     {error}
                   </div>
                 )}
 
                 <div>
-                  <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                    <FileText className="w-4 h-4 mr-2 text-gray-400" />
+                  <label className="flex items-center text-sm font-medium text-gray-700 dark:text-apple-gray-300 mb-2">
+                    <FileText className="w-4 h-4 mr-2 text-gray-400 dark:text-apple-gray-500" />
                     Descripción del trabajo realizado
                   </label>
                   <textarea
@@ -162,7 +162,7 @@ export default function SubtaskModal({ isOpen, onClose, onSuccess, taskId, subta
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-apple-blue-500 focus:border-transparent resize-none"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 placeholder-apple-gray-400 dark:placeholder-apple-gray-500 rounded-lg focus:ring-2 focus:ring-apple-blue-500 dark:focus:ring-apple-blue-900/30 focus:border-transparent resize-none"
                     rows={4}
                     required
                     placeholder="Describe qué se hizo en este periodo de tiempo..."
@@ -171,8 +171,8 @@ export default function SubtaskModal({ isOpen, onClose, onSuccess, taskId, subta
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                      <Calendar className="w-4 h-4 mr-2 text-gray-400" />
+                    <label className="flex items-center text-sm font-medium text-gray-700 dark:text-apple-gray-300 mb-2">
+                      <Calendar className="w-4 h-4 mr-2 text-gray-400 dark:text-apple-gray-500" />
                       Fecha
                     </label>
                     <input
@@ -181,14 +181,14 @@ export default function SubtaskModal({ isOpen, onClose, onSuccess, taskId, subta
                       onChange={(e) =>
                         setFormData({ ...formData, workDate: e.target.value })
                       }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-apple-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 rounded-lg focus:ring-2 focus:ring-apple-blue-500 dark:focus:ring-apple-blue-900/30 focus:border-transparent"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                      <Clock className="w-4 h-4 mr-2 text-gray-400" />
+                    <label className="flex items-center text-sm font-medium text-gray-700 dark:text-apple-gray-300 mb-2">
+                      <Clock className="w-4 h-4 mr-2 text-gray-400 dark:text-apple-gray-500" />
                       Hora inicio
                     </label>
                     <input
@@ -197,14 +197,14 @@ export default function SubtaskModal({ isOpen, onClose, onSuccess, taskId, subta
                       onChange={(e) =>
                         setFormData({ ...formData, startTime: e.target.value })
                       }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-apple-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 rounded-lg focus:ring-2 focus:ring-apple-blue-500 dark:focus:ring-apple-blue-900/30 focus:border-transparent"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                      <Clock className="w-4 h-4 mr-2 text-gray-400" />
+                    <label className="flex items-center text-sm font-medium text-gray-700 dark:text-apple-gray-300 mb-2">
+                      <Clock className="w-4 h-4 mr-2 text-gray-400 dark:text-apple-gray-500" />
                       Hora fin
                     </label>
                     <input
@@ -213,15 +213,15 @@ export default function SubtaskModal({ isOpen, onClose, onSuccess, taskId, subta
                       onChange={(e) =>
                         setFormData({ ...formData, endTime: e.target.value })
                       }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-apple-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 rounded-lg focus:ring-2 focus:ring-apple-blue-500 dark:focus:ring-apple-blue-900/30 focus:border-transparent"
                       required
                     />
                   </div>
                 </div>
 
                 {formData.startTime && formData.endTime && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
-                    <p className="text-sm text-blue-700 font-medium">
+                  <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-3">
+                    <p className="text-sm text-blue-700 dark:text-blue-400 font-medium">
                       {calculateDuration()}
                     </p>
                   </div>
@@ -231,14 +231,14 @@ export default function SubtaskModal({ isOpen, onClose, onSuccess, taskId, subta
                   <button
                     type="button"
                     onClick={onClose}
-                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                    className="flex-1 px-6 py-3 border border-gray-300 dark:border-dark-border text-gray-700 dark:text-apple-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-hover transition-colors font-medium"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 px-6 py-3 bg-apple-blue-600 text-white rounded-lg hover:bg-apple-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-6 py-3 bg-apple-blue-600 dark:bg-apple-blue-900 text-white rounded-lg hover:bg-apple-blue-700 dark:hover:bg-apple-blue-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? 'Guardando...' : subtask ? 'Actualizar' : 'Crear Registro'}
                   </button>

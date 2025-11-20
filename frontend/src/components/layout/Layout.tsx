@@ -17,7 +17,7 @@ const Layout = () => {
   const { isOpen: subtaskModalOpen, subtask, taskId, closeModal: closeSubtaskModal, refreshSubtasks } = useSubtaskModalStore();
 
   return (
-    <div className="flex h-screen bg-apple-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-apple-gray-50 dark:bg-dark-bg overflow-hidden transition-colors duration-200">
       <Sidebar onOpenProfile={() => setShowProfileModal(true)} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />

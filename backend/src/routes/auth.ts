@@ -39,13 +39,13 @@ router.post('/register', async (req, res) => {
     const accessToken = jwt.sign(
       { sub: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET || 'default_secret',
-      { expiresIn: '15m' } as jwt.SignOptions
+      { expiresIn: '24h' } as jwt.SignOptions
     );
 
     const refreshToken = jwt.sign(
       { sub: user.id, email: user.email },
       process.env.JWT_REFRESH_SECRET || 'default_refresh_secret',
-      { expiresIn: '7d' } as jwt.SignOptions
+      { expiresIn: '30d' } as jwt.SignOptions
     );
 
     res.status(201).json({
@@ -91,13 +91,13 @@ router.post('/login', async (req, res) => {
     const accessToken = jwt.sign(
       { sub: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET || 'default_secret',
-      { expiresIn: '15m' } as jwt.SignOptions
+      { expiresIn: '24h' } as jwt.SignOptions
     );
 
     const refreshToken = jwt.sign(
       { sub: user.id, email: user.email },
       process.env.JWT_REFRESH_SECRET || 'default_refresh_secret',
-      { expiresIn: '7d' } as jwt.SignOptions
+      { expiresIn: '30d' } as jwt.SignOptions
     );
 
     res.json({
@@ -139,13 +139,13 @@ router.post('/refresh', async (req, res) => {
     const newAccessToken = jwt.sign(
       { sub: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET || 'default_secret',
-      { expiresIn: '15m' } as jwt.SignOptions
+      { expiresIn: '24h' } as jwt.SignOptions
     );
 
     const newRefreshToken = jwt.sign(
       { sub: user.id, email: user.email },
       process.env.JWT_REFRESH_SECRET || 'default_refresh_secret',
-      { expiresIn: '7d' } as jwt.SignOptions
+      { expiresIn: '30d' } as jwt.SignOptions
     );
 
     res.json({

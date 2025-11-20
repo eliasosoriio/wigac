@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -53,6 +54,12 @@ export default {
             500: '#af52de',
             600: '#9d49c8',
           },
+        },
+        dark: {
+          bg: '#191919',
+          card: '#212121',
+          border: '#2a2a2a',
+          hover: '#252525',
         }
       },
       fontFamily: {

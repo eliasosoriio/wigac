@@ -170,8 +170,8 @@ const Tasks = () => {
   };
 
   const getStatusClass = (status: string) => {
-    if (status === 'COMPLETED') return 'text-gray-600 line-through';
-    return 'text-apple-gray-900';
+    if (status === 'COMPLETED') return 'text-gray-600 dark:text-gray-400 line-through';
+    return 'text-apple-gray-900 dark:text-apple-gray-100';
   };
 
   return (
@@ -179,8 +179,8 @@ const Tasks = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-semibold text-apple-gray-900">Tareas</h1>
-            <p className="text-apple-gray-600 mt-2">Gestiona tus tareas diarias y su progreso</p>
+            <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-apple-gray-100">Tareas</h1>
+            <p className="text-apple-gray-600 dark:text-apple-gray-400 mt-2">Gestiona tus tareas diarias y su progreso</p>
           </div>
           <Button variant="primary" icon={<Plus className="w-5 h-5" />} onClick={handleCreate}>
             Nueva Tarea
@@ -192,24 +192,24 @@ const Tasks = () => {
           <CardBody>
             <div className="flex flex-wrap gap-4">
               <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-medium text-apple-gray-700 mb-2">
+                <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
                   Fecha
                 </label>
                 <input
                   type="date"
                   value={filterDate}
                   onChange={(e) => setFilterDate(e.target.value)}
-                  className="w-full px-4 py-2 rounded-apple border border-apple-gray-300 focus:border-apple-blue-500 focus:ring-2 focus:ring-apple-blue-100 transition-all"
+                  className="w-full px-4 py-2 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all"
                 />
               </div>
               <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-medium text-apple-gray-700 mb-2">
+                <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
                   Estado
                 </label>
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full px-4 py-2 rounded-apple border border-apple-gray-300 focus:border-apple-blue-500 focus:ring-2 focus:ring-apple-blue-100 transition-all"
+                  className="w-full px-4 py-2 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all"
                 >
                   <option value="">Todos</option>
                   <option value="PENDING">Pendiente</option>
@@ -254,7 +254,7 @@ const Tasks = () => {
             {tasks.map((task) => (
               <div
                 key={task.id}
-                className="group bg-white hover:bg-apple-gray-50 border border-apple-gray-200 rounded-apple transition-all duration-300 hover:border-apple-gray-300 hover:shadow-lg"
+                className="group bg-white dark:bg-dark-card hover:bg-apple-gray-50 dark:hover:bg-dark-hover border border-apple-gray-200 dark:border-dark-border rounded-apple transition-all duration-300 hover:border-apple-gray-300 dark:hover:border-apple-gray-600 hover:shadow-lg"
               >
                 <div className="p-6">
                   <div className="flex items-start justify-between">
@@ -264,14 +264,14 @@ const Tasks = () => {
                       </h3>
 
                       {task.description && (
-                        <p className="text-sm text-apple-gray-600 mb-4 leading-relaxed">
+                        <p className="text-sm text-apple-gray-600 dark:text-apple-gray-400 mb-4 leading-relaxed">
                           {task.description}
                         </p>
                       )}
 
                       <div className="flex flex-wrap items-center gap-2.5">
                         {/* Status buttons */}
-                        <div className="inline-flex items-center bg-apple-gray-100 rounded-full p-1 gap-1 border border-apple-gray-200">
+                        <div className="inline-flex items-center bg-apple-gray-100 dark:bg-dark-hover rounded-full p-1 gap-1 border border-apple-gray-200 dark:border-dark-border">
                           {getStatusButton(task, 'PENDING')}
                           {getStatusButton(task, 'IN_PROGRESS')}
                           {getStatusButton(task, 'COMPLETED')}
@@ -280,9 +280,9 @@ const Tasks = () => {
                         {/* Time spent - Show subtasks total if available */}
                         {task.subtasks && task.subtasks.length > 0 ? (
                           <>
-                            <div className="inline-flex items-center px-3 py-1.5 bg-apple-blue-50 rounded-full">
-                              <Timer className="w-3.5 h-3.5 text-apple-blue-600 mr-2" />
-                              <span className="text-xs font-semibold text-apple-blue-600">
+                            <div className="inline-flex items-center px-3 py-1.5 bg-apple-blue-50 dark:bg-apple-blue-900/30 rounded-full">
+                              <Timer className="w-3.5 h-3.5 text-apple-blue-600 dark:text-apple-blue-400 mr-2" />
+                              <span className="text-xs font-semibold text-apple-blue-600 dark:text-apple-blue-400">
                                 {task.subtasks.length} {task.subtasks.length === 1 ? 'registro' : 'registros'} - {formatTime(
                                   task.subtasks.reduce((sum, st) => sum + st.timeSpentMinutes, 0)
                                 )}
@@ -296,9 +296,9 @@ const Tasks = () => {
                               const isSameDate = firstDate.toDateString() === lastDate.toDateString();
 
                               return (
-                                <div className="inline-flex items-center px-3 py-1.5 bg-apple-gray-100 rounded-full">
-                                  <Clock className="w-3.5 h-3.5 text-apple-gray-500 mr-2" />
-                                  <span className="text-xs font-medium text-apple-gray-700">
+                                <div className="inline-flex items-center px-3 py-1.5 bg-apple-gray-100 dark:bg-dark-hover rounded-full">
+                                  <Clock className="w-3.5 h-3.5 text-apple-gray-500 dark:text-apple-gray-400 mr-2" />
+                                  <span className="text-xs font-medium text-apple-gray-700 dark:text-apple-gray-300">
                                     {isSameDate
                                       ? firstDate.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })
                                       : `${firstDate.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })} - ${lastDate.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}`
@@ -309,8 +309,8 @@ const Tasks = () => {
                             })()}
                           </>
                         ) : (
-                          <div className="inline-flex items-center px-3 py-1.5 bg-apple-gray-200 rounded-full">
-                            <span className="text-xs font-medium text-apple-gray-600">
+                          <div className="inline-flex items-center px-3 py-1.5 bg-apple-gray-200 dark:bg-dark-hover rounded-full">
+                            <span className="text-xs font-medium text-apple-gray-600 dark:text-apple-gray-400">
                               Sin registros de tiempo
                             </span>
                           </div>
@@ -318,8 +318,8 @@ const Tasks = () => {
 
                         {/* Project */}
                         {task.project && (
-                          <div className="inline-flex items-center px-3 py-1.5 bg-purple-50 rounded-full">
-                            <span className="text-xs font-medium text-purple-600">
+                          <div className="inline-flex items-center px-3 py-1.5 bg-purple-50 dark:bg-purple-900/30 rounded-full">
+                            <span className="text-xs font-medium text-purple-600 dark:text-purple-400">
                               {task.project.name}
                             </span>
                           </div>
@@ -331,7 +331,7 @@ const Tasks = () => {
                     <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-6">
                       <button
                         onClick={(e) => handleEdit(task, e)}
-                        className="p-2.5 text-apple-gray-500 hover:text-apple-blue-600 hover:bg-apple-blue-50 rounded-xl transition-all duration-200"
+                        className="p-2.5 text-apple-gray-500 dark:text-apple-gray-400 hover:text-apple-blue-600 dark:hover:text-apple-blue-400 hover:bg-apple-blue-50 dark:hover:bg-apple-blue-900/30 rounded-xl transition-all duration-200"
                         title="Editar"
                       >
                         <Pencil className="w-4 h-4" />
@@ -339,7 +339,7 @@ const Tasks = () => {
 
                       <button
                         onClick={(e) => handleDelete(task.id, e)}
-                        className="p-2.5 text-apple-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all duration-200"
+                        className="p-2.5 text-apple-gray-500 dark:text-apple-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-all duration-200"
                         title="Eliminar"
                       >
                         <Trash2 className="w-4 h-4" />

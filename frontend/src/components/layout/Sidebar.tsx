@@ -29,11 +29,11 @@ const Sidebar = ({ onOpenProfile }: SidebarProps) => {
   ];
 
   return (
-    <aside className="w-64 glass border-r border-apple-gray-200 flex flex-col">
+    <aside className="w-64 glass border-r border-apple-gray-200 dark:bg-dark-card dark:border-dark-border flex flex-col transition-colors duration-200">
       {/* Logo */}
       <NavLink
         to="/"
-        className="p-6 border-b border-apple-gray-200 flex items-center justify-center hover:bg-apple-gray-50 transition-colors"
+        className="p-6 border-b border-apple-gray-200 dark:border-dark-border flex items-center justify-center hover:bg-apple-gray-50 dark:hover:bg-dark-hover transition-colors"
       >
         <img
           src="/logo.jpg"
@@ -59,7 +59,7 @@ const Sidebar = ({ onOpenProfile }: SidebarProps) => {
                   'flex items-center gap-3 px-4 py-3 rounded-apple transition-all duration-200',
                   isActive
                     ? 'bg-apple-blue-500 text-white shadow-apple'
-                    : 'text-apple-gray-700 hover:bg-apple-gray-100'
+                    : 'text-apple-gray-700 dark:text-apple-gray-300 hover:bg-apple-gray-100 dark:hover:bg-dark-hover'
                 )
               }
             >
@@ -71,24 +71,24 @@ const Sidebar = ({ onOpenProfile }: SidebarProps) => {
       </nav>
 
       {/* User section */}
-      <div className="p-4 border-t border-apple-gray-200">
+      <div className="p-4 border-t border-apple-gray-200 dark:border-dark-border">
         <button
           onClick={onOpenProfile}
-          className="w-full flex items-center gap-3 px-4 py-3 mb-2 rounded-apple hover:bg-apple-gray-100 transition-all duration-200 cursor-pointer"
+          className="w-full flex items-center gap-3 px-4 py-3 mb-2 rounded-apple hover:bg-apple-gray-100 dark:hover:bg-dark-hover transition-all duration-200 cursor-pointer"
         >
           <div className="w-10 h-10 rounded-full bg-apple-blue-500 flex items-center justify-center text-white font-semibold">
             {user?.name.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <p className="text-sm font-medium text-apple-gray-900 truncate">
+            <p className="text-sm font-medium text-apple-gray-900 dark:text-apple-gray-100 truncate">
               {user?.name}
             </p>
-            <p className="text-xs text-apple-gray-500 truncate">{user?.email}</p>
+            <p className="text-xs text-apple-gray-500 dark:text-apple-gray-400 truncate">{user?.email}</p>
           </div>
         </button>
         <button
           onClick={logout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-apple text-apple-gray-700 hover:bg-apple-red-50 hover:text-apple-red-600 transition-all duration-200"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-apple text-apple-gray-700 dark:text-apple-gray-300 hover:bg-apple-red-50 dark:hover:bg-red-900/20 hover:text-apple-red-600 dark:hover:text-red-400 transition-all duration-200"
         >
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Cerrar Sesión</span>

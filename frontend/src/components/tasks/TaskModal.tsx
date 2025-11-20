@@ -132,14 +132,14 @@ export const TaskModal = ({ isOpen, onClose, onSuccess, task }: TaskModalProps) 
         />
 
         <div>
-          <label className="block text-sm font-medium text-apple-gray-700 mb-2">
+          <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
             Descripción
           </label>
           <textarea
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             placeholder="Describe la tarea..."
-            className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 focus:border-apple-blue-500 focus:ring-2 focus:ring-apple-blue-100 transition-all resize-none"
+            className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 placeholder-apple-gray-400 dark:placeholder-apple-gray-500 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all resize-none"
             rows={4}
             disabled={loading}
           />
@@ -147,13 +147,13 @@ export const TaskModal = ({ isOpen, onClose, onSuccess, task }: TaskModalProps) 
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-apple-gray-700 mb-2">
+            <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
               Proyecto
             </label>
             <select
               value={formData.projectId}
               onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
-              className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 focus:border-apple-blue-500 focus:ring-2 focus:ring-apple-blue-100 transition-all"
+              className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all"
               disabled={loading}
             >
               <option value="">Sin proyecto</option>
@@ -166,13 +166,13 @@ export const TaskModal = ({ isOpen, onClose, onSuccess, task }: TaskModalProps) 
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-apple-gray-700 mb-2">
+            <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
               Estado
             </label>
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-              className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 focus:border-apple-blue-500 focus:ring-2 focus:ring-apple-blue-100 transition-all"
+              className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all"
               disabled={loading}
             >
               <option value="PENDING">Pendiente</option>

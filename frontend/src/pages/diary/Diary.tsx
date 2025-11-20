@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Clock, ChevronDown, ChevronUp, Mail } from 'lucide-react';
+import { Calendar, Clock, ChevronDown, ChevronUp, Mail, Plus } from 'lucide-react';
 import { Card, CardBody, Button } from '../../components/ui';
 import PageTransition from '../../components/animations/PageTransition';
+import { SubtaskModal } from '../../components/diary/SubtaskModal';
 import { useAuthStore } from '../../store/authStore';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -36,6 +37,8 @@ const Diary = () => {
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
   useEffect(() => {
     fetchSubtasks();
@@ -153,15 +156,14 @@ const Diary = () => {
 
     // Generar el cuerpo del correo
     let body = 'Hola,\n\n';
-    body += '1.- ¿Que he hecho hoy, y resultado (en desarrollo o finalizado)?\n\n\n';
+    body += '1.- ¿Qué he hecho hoy, y resultado (en desarrollo o finalizado)?\n\n';
 
-    Object.values(taskGroups).forEach((taskSubtasks, index) => {
+    Object.values(taskGroups).forEach((taskSubtasks) => {
       const task = taskSubtasks[0].task;
-      const projectName = task.project?.name || 'SIN PROYECTO';
+      const projectName = (task.project?.name || 'SIN PROYECTO').toUpperCase();
       const taskTitle = task.title.toUpperCase();
 
-      body += `${index + 1}. ${projectName} - ${taskTitle}\n`;
-      body += '───────────────────────────────────────────────────────────────────\n';
+      body += `    - ${projectName} - ${taskTitle}\n`;
 
       // Combinar descripciones de subtareas
       const descriptions = taskSubtasks
@@ -170,20 +172,27 @@ const Diary = () => {
         .join(' ');
 
       if (descriptions) {
-        body += `   Descripción: ${descriptions}\n\n`;
+        body += `    ${descriptions}\n`;
       }
 
       // Determinar resultado según el estado
       const resultado = task.status === 'COMPLETED' ? 'Finalizado' : 'En desarrollo';
-      body += `   Resultado: ${resultado}\n\n\n`;
+      body += `      Resultado: ${resultado}\n\n`;
     });
 
-    body += '2.- ¿Que voy a hacer a partir de este momento?\n';
-    body += '    -\n\n';
-    body += '3.- Horas diarias imputadas\n'; //Horas totales del día
+    body += '2.- ¿Qué voy a hacer a partir de este momento?\n\n';
+    body += '    - \n\n';
+    body += '3.- Horas diarias imputadas\n';
     body += `    ${getTotalTimeForDate(date)}\n\n`;
     body += 'Un saludo,\n';
-    body += user?.name || 'Usuario';
+
+    // Formatear nombre con capitalización
+    const fullName = user?.name || 'Usuario';
+    const nameParts = fullName.split(' ');
+    const formattedName = nameParts.map(part =>
+      part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+    ).join(' ');
+    body += `${formattedName}.`;
 
     // Destinatarios
     const to = 'Antonio Carro Mariño | Sdweb <antonio.carro@sdweb.es>, Brais Martinez | Sdweb <brais.martinez@sdweb.es>';
@@ -226,11 +235,23 @@ const Diary = () => {
   return (
     <PageTransition>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-white">Diario</h1>
-          <p className="text-apple-gray-600 dark:text-apple-gray-400 mt-2">
-            Registro cronológico de tus actividades
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-white">Diario</h1>
+            <p className="text-apple-gray-600 dark:text-apple-gray-400 mt-2">
+              Registro cronológico de tus actividades
+            </p>
+          </div>
+          <Button
+            variant="primary"
+            icon={<Plus className="w-5 h-5" />}
+            onClick={() => {
+              setSelectedDate(new Date().toISOString().split('T')[0]);
+              setIsModalOpen(true);
+            }}
+          >
+            Nuevo Registro
+          </Button>
         </div>
 
         {sortedDates.length === 0 ? (
@@ -271,6 +292,19 @@ const Diary = () => {
                     </button>
 
                     <div className="flex items-center gap-3">
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedDate(date);
+                          setIsModalOpen(true);
+                        }}
+                        variant="primary"
+                        className="flex items-center gap-2 px-4 py-2"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Añadir</span>
+                      </Button>
+
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -347,6 +381,15 @@ const Diary = () => {
           </div>
         )}
       </div>
+
+      {/* Modal para crear subtarea */}
+      <SubtaskModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={fetchSubtasks}
+        selectedDate={selectedDate}
+        token={token || ''}
+      />
     </PageTransition>
   );
 };

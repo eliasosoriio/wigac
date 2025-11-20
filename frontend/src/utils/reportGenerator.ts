@@ -5,7 +5,7 @@ interface Subtask {
   id: number;
   title?: string;
   description?: string;
-  status?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+  status?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'TRANSVERSAL';
   workDate: string;
   startTime: string;
   endTime: string;
@@ -16,7 +16,7 @@ interface Task {
   id: number;
   title: string;
   description?: string;
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'TRANSVERSAL';
   project?: {
     id: number;
     name: string;
@@ -27,7 +27,8 @@ interface Task {
 const statusLabels = {
   PENDING: 'Pendiente',
   IN_PROGRESS: 'En progreso',
-  COMPLETED: 'Completada'
+  COMPLETED: 'Completada',
+  TRANSVERSAL: 'Transversal'
 };
 
 const calculateDuration = (startTime: string, endTime: string): string => {
@@ -133,13 +134,15 @@ export const generateProgressReport = (tasks: Task[], date: Date): string => {
   const completedTasks = tasks.filter(t => t.status === 'COMPLETED').length;
   const inProgressTasks = tasks.filter(t => t.status === 'IN_PROGRESS').length;
   const pendingTasks = tasks.filter(t => t.status === 'PENDING').length;
+  const transversalTasks = tasks.filter(t => t.status === 'TRANSVERSAL').length;
 
   report += `RESUMEN GENERAL\n`;
   report += `───────────────────────────────────────────────────────────────────\n`;
   report += `Total de tareas: ${totalTasks}\n`;
   report += `├─ Completadas: ${completedTasks} (${Math.round(completedTasks/totalTasks*100)}%)\n`;
   report += `├─ En progreso: ${inProgressTasks} (${Math.round(inProgressTasks/totalTasks*100)}%)\n`;
-  report += `└─ Pendientes: ${pendingTasks} (${Math.round(pendingTasks/totalTasks*100)}%)\n\n`;
+  report += `├─ Pendientes: ${pendingTasks} (${Math.round(pendingTasks/totalTasks*100)}%)\n`;
+  report += `└─ Transversales: ${transversalTasks} (${Math.round(transversalTasks/totalTasks*100)}%)\n\n`;
 
   // Detalles por proyecto
   Object.entries(projectGroups).forEach(([projectName, projectTasks]) => {

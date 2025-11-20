@@ -17,7 +17,7 @@ interface Task {
   id: number;
   title: string;
   description: string;
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'TRANSVERSAL';
   workDate: string;
   startTime: string;
   endTime: string;
@@ -178,6 +178,12 @@ const Tasks = () => {
         label: 'Completada',
         activeClass: 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm',
         hoverClass: 'text-gray-500 hover:text-green-400 hover:bg-green-500/10'
+      },
+      TRANSVERSAL: {
+        icon: Timer,
+        label: 'Transversal',
+        activeClass: 'bg-purple-500 text-white',
+        hoverClass: 'text-gray-500 hover:text-purple-400 hover:bg-purple-500/10'
       }
     };
 
@@ -295,6 +301,17 @@ const Tasks = () => {
                     <Check className="w-3 h-3" />
                     Completada
                   </button>
+                  <button
+                    onClick={() => setFilterStatus('TRANSVERSAL')}
+                    className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all duration-300 flex items-center gap-1.5 ${
+                      filterStatus === 'TRANSVERSAL'
+                        ? 'bg-purple-500 text-white shadow-sm'
+                        : 'text-apple-gray-600 dark:text-apple-gray-400 hover:text-purple-500'
+                    }`}
+                  >
+                    <Timer className="w-3 h-3" />
+                    Transversal
+                  </button>
                 </div>
 
                 {/* Clear Button */}
@@ -355,6 +372,7 @@ const Tasks = () => {
                           {getStatusButton(task, 'PENDING')}
                           {getStatusButton(task, 'IN_PROGRESS')}
                           {getStatusButton(task, 'COMPLETED')}
+                          {getStatusButton(task, 'TRANSVERSAL')}
                         </div>
 
                         {/* Time spent - Show subtasks total if available */}

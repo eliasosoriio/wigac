@@ -14,7 +14,7 @@ interface Task {
   id: number;
   title: string;
   description: string;
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'TRANSVERSAL';
   subtasks?: Array<{
     id: number;
     workDate: string;

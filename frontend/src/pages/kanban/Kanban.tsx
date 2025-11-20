@@ -24,7 +24,7 @@ interface Task {
   id: number;
   title: string;
   description: string;
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'TRANSVERSAL';
   project?: {
     id: number;
     name: string;
@@ -71,13 +71,15 @@ const KanbanCard = ({ task }: KanbanCardProps) => {
   const statusColors = {
     PENDING: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
     IN_PROGRESS: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    COMPLETED: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+    COMPLETED: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+    TRANSVERSAL: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
   };
 
   const statusLabels = {
     PENDING: 'Pendiente',
     IN_PROGRESS: 'En Proceso',
-    COMPLETED: 'Completada'
+    COMPLETED: 'Completada',
+    TRANSVERSAL: 'Transversal'
   };
 
   return (
@@ -142,13 +144,15 @@ const DragOverlayCard = ({ task }: { task: Task }) => {
   const statusColors = {
     PENDING: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
     IN_PROGRESS: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    COMPLETED: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+    COMPLETED: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+    TRANSVERSAL: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
   };
 
   const statusLabels = {
     PENDING: 'Pendiente',
     IN_PROGRESS: 'En Proceso',
-    COMPLETED: 'Completada'
+    COMPLETED: 'Completada',
+    TRANSVERSAL: 'Transversal'
   };
 
   return (
@@ -287,7 +291,7 @@ const Kanban = () => {
     const taskId = parseInt(active.id.toString());
 
     // Check if dropping over a column or another task
-    let newStatus: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+    let newStatus: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'TRANSVERSAL';
 
     // If over.id is a status string, use it directly
     if (over.id === 'PENDING' || over.id === 'IN_PROGRESS' || over.id === 'COMPLETED') {

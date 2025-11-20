@@ -6,32 +6,43 @@ const router = Router();
 
 router.use(authenticate);
 
-// GET /api/subtasks?taskId=X - Obtener subtareas de una tarea
+// GET /api/subtasks?taskId=X - Obtener subtareas de una tarea o todas las subtareas del usuario
 router.get('/', async (req: AuthRequest, res) => {
   try {
     const { tasks, subtasks } = getRepositories();
     const taskId = req.query.taskId ? parseInt(req.query.taskId as string) : undefined;
 
-    if (!taskId) {
-      return res.status(400).json({ message: 'taskId es requerido' });
+    // Si se proporciona taskId, obtener subtareas de esa tarea específica
+    if (taskId) {
+      // Verificar que la tarea pertenece al usuario
+      const task = await tasks.findOne({
+        where: { id: taskId, assignedUserId: req.user!.id },
+      });
+
+      if (!task) {
+        return res.status(404).json({ message: 'Tarea no encontrada' });
+      }
+
+      // Obtener subtareas de la tarea
+      const taskSubtasks = await subtasks.find({
+        where: { taskId },
+        order: { workDate: 'DESC', startTime: 'DESC' },
+      });
+
+      return res.json(taskSubtasks);
     }
 
-    // Verificar que la tarea pertenece al usuario
-    const task = await tasks.findOne({
-      where: { id: taskId, assignedUserId: req.user!.id },
-    });
+    // Si no se proporciona taskId, obtener todas las subtareas del usuario
+    const allSubtasks = await subtasks
+      .createQueryBuilder('subtask')
+      .leftJoinAndSelect('subtask.task', 'task')
+      .leftJoinAndSelect('task.project', 'project')
+      .where('task.assignedUserId = :userId', { userId: req.user!.id })
+      .orderBy('subtask.workDate', 'DESC')
+      .addOrderBy('subtask.startTime', 'ASC')
+      .getMany();
 
-    if (!task) {
-      return res.status(404).json({ message: 'Tarea no encontrada' });
-    }
-
-    // Obtener subtareas de la tarea
-    const taskSubtasks = await subtasks.find({
-      where: { taskId },
-      order: { workDate: 'DESC', startTime: 'DESC' },
-    });
-
-    res.json(taskSubtasks);
+    res.json(allSubtasks);
   } catch (error) {
     console.error('Error al obtener subtareas:', error);
     res.status(500).json({ message: 'Error al obtener subtareas' });

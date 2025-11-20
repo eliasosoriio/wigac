@@ -12,6 +12,7 @@ import subtasksRoutes from './routes/subtasks';
 import activitiesRoutes from './routes/activities';
 import wikiRoutes from './routes/wiki';
 import reportsRoutes from './routes/reports';
+import backupRoutes from './routes/backup';
 
 dotenv.config();
 
@@ -22,7 +23,8 @@ const PORT = process.env.PORT || 3001;
 app.use(helmet());
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:8080',
-  credentials: true
+  credentials: true,
+  exposedHeaders: ['Content-Disposition']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -36,6 +38,7 @@ app.use('/api/subtasks', subtasksRoutes);
 app.use('/api/activities', activitiesRoutes);
 app.use('/api/wiki', wikiRoutes);
 app.use('/api/reports', reportsRoutes);
+app.use('/api/backup', backupRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -348,7 +348,7 @@ const Tasks = () => {
                   </div>
 
                   {/* Subtask List */}
-                  <SubtaskList taskId={task.id} onUpdate={fetchTasks} />
+                  <SubtaskList taskId={task.id} initialSubtasks={task.subtasks} onUpdate={fetchTasks} />
                 </div>
               </div>
             ))}

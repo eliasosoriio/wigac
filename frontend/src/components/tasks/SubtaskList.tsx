@@ -18,14 +18,20 @@ interface Subtask {
 
 interface SubtaskListProps {
   taskId: number;
+  initialSubtasks?: Subtask[];
   onUpdate: () => void;
 }
 
-export function SubtaskList({ taskId, onUpdate }: SubtaskListProps) {
-  const [subtasks, setSubtasks] = useState<Subtask[]>([]);
+export function SubtaskList({ taskId, initialSubtasks = [], onUpdate }: SubtaskListProps) {
+  const [subtasks, setSubtasks] = useState<Subtask[]>(initialSubtasks);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const { openModal, setRefreshCallback } = useSubtaskModalStore();
+
+  // Update subtasks when initialSubtasks changes
+  useEffect(() => {
+    setSubtasks(initialSubtasks);
+  }, [initialSubtasks]);
 
   const fetchSubtasks = async () => {
     setLoading(true);

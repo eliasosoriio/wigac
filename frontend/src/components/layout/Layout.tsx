@@ -4,11 +4,17 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import ProfileModal from '../profile/ProfileModal';
 import ProjectModal from '../projects/ProjectModal';
+import TaskModal from '../tasks/TaskModal';
+import SubtaskModal from '../tasks/SubtaskModal';
 import { useProjectModalStore } from '../../store/projectModalStore';
+import { useTaskModalStore } from '../../store/taskModalStore';
+import { useSubtaskModalStore } from '../../store/subtaskModalStore';
 
 const Layout = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const { isOpen, project, closeModal, refreshProjects } = useProjectModalStore();
+  const { isOpen: projectModalOpen, project, closeModal: closeProjectModal, refreshProjects } = useProjectModalStore();
+  const { isOpen: taskModalOpen, task, closeModal: closeTaskModal, refreshTasks } = useTaskModalStore();
+  const { isOpen: subtaskModalOpen, subtask, taskId, closeModal: closeSubtaskModal, refreshSubtasks } = useSubtaskModalStore();
 
   return (
     <div className="flex h-screen bg-apple-gray-50 overflow-hidden">
@@ -28,11 +34,30 @@ const Layout = () => {
 
       {/* Project Modal - Rendered at app level */}
       <ProjectModal
-        isOpen={isOpen}
-        onClose={closeModal}
+        isOpen={projectModalOpen}
+        onClose={closeProjectModal}
         onSuccess={refreshProjects}
         project={project}
       />
+
+      {/* Task Modal - Rendered at app level */}
+      <TaskModal
+        isOpen={taskModalOpen}
+        onClose={closeTaskModal}
+        onSuccess={refreshTasks}
+        task={task}
+      />
+
+      {/* Subtask Modal - Rendered at app level */}
+      {taskId && (
+        <SubtaskModal
+          isOpen={subtaskModalOpen}
+          onClose={closeSubtaskModal}
+          onSuccess={refreshSubtasks}
+          taskId={taskId}
+          subtask={subtask}
+        />
+      )}
     </div>
   );
 };

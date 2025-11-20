@@ -4,6 +4,7 @@ import { Project } from '../entities/Project';
 import { Task } from '../entities/Task';
 import { Activity } from '../entities/Activity';
 import { WikiPage } from '../entities/WikiPage';
+import { Subtask } from '../entities/Subtask';
 
 export const getRepositories = () => ({
   users: AppDataSource.getRepository(User),
@@ -11,4 +12,5 @@ export const getRepositories = () => ({
   tasks: AppDataSource.getRepository(Task),
   activities: AppDataSource.getRepository(Activity),
   wikiPages: AppDataSource.getRepository(WikiPage),
+  subtasks: AppDataSource.getRepository(Subtask),
 });

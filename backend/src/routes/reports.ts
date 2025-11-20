@@ -43,7 +43,7 @@ router.get('/daily', async (req: AuthRequest, res) => {
       date: format(date, 'dd/MM/yyyy'),
       activities: activities.map(a => ({
         task: a.task.title,
-        project: a.task.project.name,
+        project: a.task.project?.name || 'Sin proyecto',
         hours: a.hours,
         description: a.description || ''
       })),
@@ -101,7 +101,7 @@ router.post('/daily/send', async (req: AuthRequest, res) => {
       date: format(date, 'dd/MM/yyyy'),
       activities: activities.map(a => ({
         task: a.task.title,
-        project: a.task.project.name,
+        project: a.task.project?.name || 'Sin proyecto',
         hours: a.hours,
         description: a.description || ''
       })),

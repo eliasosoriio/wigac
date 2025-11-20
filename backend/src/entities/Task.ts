@@ -2,9 +2,10 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { Project } from './Project';
 import { User } from './User';
 import { Activity } from './Activity';
+import { Subtask } from './Subtask';
 
 export enum TaskStatus {
-  TODO = 'TODO',
+  PENDING = 'PENDING',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
 }
@@ -29,7 +30,7 @@ export class Task {
   @Column({
     type: 'enum',
     enum: TaskStatus,
-    default: TaskStatus.TODO,
+    default: TaskStatus.PENDING,
   })
   status!: TaskStatus;
 
@@ -49,12 +50,24 @@ export class Task {
   @Column({ type: 'timestamp', nullable: true })
   dueDate?: Date;
 
-  @ManyToOne(() => Project, (project) => project.tasks)
-  @JoinColumn({ name: 'projectId' })
-  project!: Project;
+  @Column({ type: 'date', nullable: true })
+  workDate?: Date;
 
-  @Column()
-  projectId!: number;
+  @Column({ type: 'time', nullable: true })
+  startTime?: string;
+
+  @Column({ type: 'time', nullable: true })
+  endTime?: string;
+
+  @Column({ type: 'int', nullable: true })
+  timeSpentMinutes?: number;
+
+  @ManyToOne(() => Project, (project) => project.tasks, { nullable: true })
+  @JoinColumn({ name: 'projectId' })
+  project?: Project;
+
+  @Column({ nullable: true })
+  projectId?: number;
 
   @ManyToOne(() => User, (user) => user.tasks, { nullable: true })
   @JoinColumn({ name: 'assignedUserId' })
@@ -71,4 +84,7 @@ export class Task {
 
   @OneToMany(() => Activity, (activity) => activity.task)
   activities!: Activity[];
+
+  @OneToMany(() => Subtask, (subtask) => subtask.task)
+  subtasks!: Subtask[];
 }

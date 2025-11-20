@@ -14,18 +14,31 @@ router.get('/', async (req: AuthRequest, res) => {
     const { tasks: taskRepository } = getRepositories();
     const userId = req.user!.id;
     const { projectId, status, priority, date } = req.query;
-    const where: any = { assignedUserId: userId };
 
-    if (projectId) where.projectId = parseInt(projectId as string);
-    if (status) where.status = status;
-    if (priority) where.priority = priority;
-    if (date) where.workDate = new Date(date as string);
+    let query = taskRepository
+      .createQueryBuilder('task')
+      .leftJoinAndSelect('task.project', 'project')
+      .leftJoinAndSelect('task.subtasks', 'subtask')
+      .where('task.assignedUserId = :userId', { userId });
 
-    const tasks = await taskRepository.find({
-      where,
-      relations: ['project', 'subtasks'],
-      order: { workDate: 'DESC', startTime: 'ASC' }
-    });
+    if (projectId) {
+      query = query.andWhere('task.projectId = :projectId', { projectId: parseInt(projectId as string) });
+    }
+    if (status) {
+      query = query.andWhere('task.status = :status', { status });
+    }
+    if (priority) {
+      query = query.andWhere('task.priority = :priority', { priority });
+    }
+
+    // Filter by subtask workDate if date parameter is provided
+    if (date) {
+      query = query.andWhere('subtask.workDate = :date', { date });
+    }
+
+    const tasks = await query
+      .orderBy('task.id', 'DESC')
+      .getMany();
 
     res.json(tasks);
   } catch (error) {

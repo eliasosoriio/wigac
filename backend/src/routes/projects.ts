@@ -19,7 +19,16 @@ router.get('/', async (req: AuthRequest, res) => {
       relations: ['tasks'],
       order: { createdAt: 'DESC' }
     });
-    res.json(projects);
+
+    // Add task count to each project
+    const projectsWithCount = projects.map(project => ({
+      ...project,
+      _count: {
+        tasks: project.tasks?.length || 0
+      }
+    }));
+
+    res.json(projectsWithCount);
   } catch (error) {
     console.error('Get projects error:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -35,14 +44,22 @@ router.get('/:id', async (req: AuthRequest, res) => {
 
     const project = await projectRepository.findOne({
       where: { id: parseInt(id), createdById: userId },
-      relations: ['tasks', 'wikiPages']
+      relations: ['tasks', 'tasks.subtasks', 'wikiPages']
     });
 
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    res.json(project);
+    // Add task count
+    const projectWithCount = {
+      ...project,
+      _count: {
+        tasks: project.tasks?.length || 0
+      }
+    };
+
+    res.json(projectWithCount);
   } catch (error) {
     console.error('Get project error:', error);
     res.status(500).json({ message: 'Internal server error' });

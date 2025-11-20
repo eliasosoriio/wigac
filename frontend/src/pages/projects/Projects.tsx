@@ -42,11 +42,9 @@ const Projects = () => {
         return;
       }
 
-      console.log('Fetching projects from:', `${API_URL}/projects`);
       const response = await axios.get(`${API_URL}/projects`, {
         headers: { Authorization: `Bearer ${currentToken}` }
       });
-      console.log('Projects response:', response.data);
       setProjects(response.data);
     } catch (error: any) {
       console.error('Error fetching projects:', error);
@@ -118,10 +116,10 @@ const Projects = () => {
       <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold text-apple-gray-900">
+          <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-apple-gray-100">
             Proyectos
           </h1>
-          <p className="text-apple-gray-600 mt-2">
+          <p className="text-apple-gray-600 dark:text-apple-gray-400 mt-2">
             Gestiona tus proyectos y su progreso
           </p>
         </div>
@@ -138,7 +136,7 @@ const Projects = () => {
         <Card>
           <CardBody>
             <div className="text-center py-12">
-              <p className="text-apple-gray-600 mb-4">No tienes proyectos todavía</p>
+              <p className="text-apple-gray-600 dark:text-apple-gray-400 mb-4">No tienes proyectos todavía</p>
               <Button variant="primary" icon={<Plus className="w-5 h-5" />} onClick={handleCreate}>
                 Crear tu primer proyecto
               </Button>
@@ -162,13 +160,13 @@ const Projects = () => {
                   <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={(e) => handleEdit(project, e)}
-                      className="p-1.5 rounded-lg hover:bg-apple-blue-100 text-apple-blue-600 transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-apple-blue-100 dark:hover:bg-apple-blue-900/30 text-apple-blue-600 dark:text-apple-blue-400 transition-colors"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={(e) => handleDelete(project.id, e)}
-                      className="p-1.5 rounded-lg hover:bg-apple-red-100 text-apple-red-600 transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-apple-red-100 dark:hover:bg-red-900/30 text-apple-red-600 dark:text-red-400 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -176,16 +174,16 @@ const Projects = () => {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold text-apple-gray-900">
+                  <h3 className="text-lg font-semibold text-apple-gray-900 dark:text-apple-gray-100">
                     {project.name}
                   </h3>
-                  <p className="text-sm text-apple-gray-600 mt-1 line-clamp-2">
+                  <p className="text-sm text-apple-gray-600 dark:text-apple-gray-400 mt-1 line-clamp-2">
                     {project.description}
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-apple-gray-200">
-                  <span className="text-sm text-apple-gray-600">
+                <div className="pt-4 border-t border-apple-gray-200 dark:border-dark-border">
+                  <span className="text-sm text-apple-gray-600 dark:text-apple-gray-400">
                     {project._count?.tasks || 0} tareas
                   </span>
                 </div>

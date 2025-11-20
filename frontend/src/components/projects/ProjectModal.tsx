@@ -94,14 +94,14 @@ export const ProjectModal = ({ isOpen, onClose, onSuccess, project }: ProjectMod
         />
 
         <div>
-          <label className="block text-sm font-medium text-apple-gray-700 mb-2">
+          <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
             Descripción
           </label>
           <textarea
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             placeholder="Describe el proyecto..."
-            className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 focus:border-apple-blue-500 focus:ring-2 focus:ring-apple-blue-100 transition-all resize-none"
+            className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 placeholder-apple-gray-400 dark:placeholder-apple-gray-500 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all resize-none"
             rows={4}
             required
             disabled={loading}
@@ -109,13 +109,13 @@ export const ProjectModal = ({ isOpen, onClose, onSuccess, project }: ProjectMod
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-apple-gray-700 mb-2">
+          <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
             Estado
           </label>
           <select
             value={formData.status}
             onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-            className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 focus:border-apple-blue-500 focus:ring-2 focus:ring-apple-blue-100 transition-all"
+            className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all"
             disabled={loading}
           >
             <option value="ACTIVE">Activo</option>

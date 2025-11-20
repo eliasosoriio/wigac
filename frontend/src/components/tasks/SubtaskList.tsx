@@ -19,10 +19,11 @@ interface Subtask {
 interface SubtaskListProps {
   taskId: number;
   initialSubtasks?: Subtask[];
+  filterDate?: string;
   onUpdate: () => void;
 }
 
-export function SubtaskList({ taskId, initialSubtasks = [], onUpdate }: SubtaskListProps) {
+export function SubtaskList({ taskId, initialSubtasks = [], filterDate, onUpdate }: SubtaskListProps) {
   const [subtasks, setSubtasks] = useState<Subtask[]>(initialSubtasks);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -53,10 +54,11 @@ export function SubtaskList({ taskId, initialSubtasks = [], onUpdate }: SubtaskL
   };
 
   useEffect(() => {
-    if (expanded) {
+    // Only fetch if expanded and no filter date (otherwise use initialSubtasks)
+    if (expanded && !filterDate) {
       fetchSubtasks();
     }
-  }, [expanded, taskId]);
+  }, [expanded, taskId, filterDate]);
 
   useEffect(() => {
     setRefreshCallback(() => {

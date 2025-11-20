@@ -3,10 +3,13 @@ import { Plus, Clock, Timer, Pencil, Trash2, Circle, Loader2, Check, Calendar } 
 import { Button, Card, CardBody } from '../../components/ui';
 import PageTransition from '../../components/animations/PageTransition';
 import { SubtaskList } from '../../components/tasks/SubtaskList';
+import { ExportMenu } from '../../components/tasks/ExportMenu';
 import { useAuthStore } from '../../store/authStore';
 import { useTaskModalStore } from '../../store/taskModalStore';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { generateDailyReport, generateProgressReport, downloadReport, copyToClipboard } from '../../utils/reportGenerator';
+import { format } from 'date-fns';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
 
@@ -74,6 +77,40 @@ const Tasks = () => {
     fetchTasks();
     setRefreshCallback(fetchTasks);
   }, [filterDate, filterStatus]);
+
+  const handleExportDailyReport = async (date: Date) => {
+    const report = generateDailyReport(tasks, date);
+    const filename = `${format(date, 'yyyyMMdd')}_tareas.txt`;
+    downloadReport(report, filename);
+    toast.success('Reporte descargado');
+  };
+
+  const handleCopyDailyReport = async (date: Date) => {
+    const report = generateDailyReport(tasks, date);
+    const success = await copyToClipboard(report);
+    if (success) {
+      toast.success('Reporte copiado al portapapeles');
+    } else {
+      toast.error('Error al copiar al portapapeles');
+    }
+  };
+
+  const handleExportProgressReport = async (date: Date) => {
+    const report = generateProgressReport(tasks, date);
+    const filename = `${format(date, 'yyyyMMdd')}_informe.txt`;
+    downloadReport(report, filename);
+    toast.success('Informe descargado');
+  };
+
+  const handleCopyProgressReport = async (date: Date) => {
+    const report = generateProgressReport(tasks, date);
+    const success = await copyToClipboard(report);
+    if (success) {
+      toast.success('Informe copiado al portapapeles');
+    } else {
+      toast.error('Error al copiar al portapapeles');
+    }
+  };
 
   const handleDelete = async (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -182,12 +219,18 @@ const Tasks = () => {
             <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-apple-gray-100">Tareas</h1>
             <p className="text-apple-gray-600 dark:text-apple-gray-400 mt-2">Gestiona tus tareas diarias y su progreso</p>
           </div>
-          <Button variant="primary" icon={<Plus className="w-5 h-5" />} onClick={handleCreate}>
-            Nueva Tarea
-          </Button>
-        </div>
-
-        {/* Filters */}
+          <div className="flex gap-2">
+            <ExportMenu
+              onExportDailyReport={handleExportDailyReport}
+              onCopyDailyReport={handleCopyDailyReport}
+              onExportProgressReport={handleExportProgressReport}
+              onCopyProgressReport={handleCopyProgressReport}
+            />
+            <Button variant="primary" icon={<Plus className="w-5 h-5" />} onClick={handleCreate}>
+              Nueva Tarea
+            </Button>
+          </div>
+        </div>        {/* Filters */}
         <Card>
           <CardBody>
             <div className="space-y-4">

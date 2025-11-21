@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Clock, Timer, Pencil, Trash2, Circle, Loader2, Check, Calendar } from 'lucide-react';
 import { Button, Card, CardBody } from '../../components/ui';
-import PageTransition from '../../components/animations/PageTransition';
 import { SubtaskList } from '../../components/tasks/SubtaskList';
 import { ExportMenu } from '../../components/tasks/ExportMenu';
 import { useAuthStore } from '../../store/authStore';
@@ -218,25 +217,24 @@ const Tasks = () => {
   };
 
   return (
-    <PageTransition>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-apple-gray-100">Tareas</h1>
-            <p className="text-apple-gray-600 dark:text-apple-gray-400 mt-2">Gestiona tus tareas diarias y su progreso</p>
-          </div>
-          <div className="flex gap-2">
-            <ExportMenu
-              onExportDailyReport={handleExportDailyReport}
-              onCopyDailyReport={handleCopyDailyReport}
-              onExportProgressReport={handleExportProgressReport}
-              onCopyProgressReport={handleCopyProgressReport}
-            />
-            <Button variant="primary" icon={<Plus className="w-5 h-5" />} onClick={handleCreate}>
-              Nueva Tarea
-            </Button>
-          </div>
-        </div>        {/* Filters */}
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-apple-gray-100">Tareas</h1>
+          <p className="text-apple-gray-600 dark:text-apple-gray-400 mt-2">Gestiona tus tareas diarias y su progreso</p>
+        </div>
+        <div className="flex gap-2">
+          <ExportMenu
+            onExportDailyReport={handleExportDailyReport}
+            onCopyDailyReport={handleCopyDailyReport}
+            onExportProgressReport={handleExportProgressReport}
+            onCopyProgressReport={handleCopyProgressReport}
+          />
+          <Button variant="primary" icon={<Plus className="w-5 h-5" />} onClick={handleCreate}>
+            Nueva Tarea
+          </Button>
+        </div>
+      </div>        {/* Filters */}
         <Card>
           <CardBody>
             <div className="space-y-4">
@@ -453,7 +451,6 @@ const Tasks = () => {
           </div>
         )}
       </div>
-    </PageTransition>
   );
 };
 

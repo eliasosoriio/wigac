@@ -5,11 +5,9 @@ import Layout from './components/layout/Layout';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Dashboard from './pages/Dashboard';
-import Projects from './pages/projects/Projects';
 import ProjectDetail from './pages/projects/ProjectDetail';
-import Tasks from './pages/tasks/Tasks';
+import TasksLayout from './pages/tasks/TasksLayout';
 import Kanban from './pages/kanban/Kanban';
-import Diary from './pages/diary/Diary';
 import TimeTracking from './pages/timetracking/TimeTracking';
 import Wiki from './pages/wiki/Wiki';
 import WikiEditor from './pages/wiki/WikiEditor';
@@ -26,11 +24,9 @@ function AppRoutes() {
 
         <Route path="/" element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}>
           <Route index element={<Dashboard />} />
-          <Route path="projects" element={<Projects />} />
           <Route path="projects/:id" element={<ProjectDetail />} />
-          <Route path="tasks" element={<Tasks />} />
+          <Route path="tasks" element={<TasksLayout />} />
           <Route path="kanban" element={<Kanban />} />
-          <Route path="diary" element={<Diary />} />
           <Route path="timetracking" element={<TimeTracking />} />
           <Route path="wiki" element={<Wiki />} />
           <Route path="wiki/:id" element={<WikiEditor />} />

@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Calendar, Clock, ChevronDown, ChevronUp, Mail, Plus } from 'lucide-react';
 import { Card, CardBody, Button } from '../../components/ui';
-import PageTransition from '../../components/animations/PageTransition';
 import { SubtaskModal } from '../../components/diary/SubtaskModal';
+import { ExportMenu } from '../../components/tasks/ExportMenu';
 import { useAuthStore } from '../../store/authStore';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { generateDailyReport, generateProgressReport, downloadReport, copyToClipboard } from '../../utils/reportGenerator';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
 
@@ -209,21 +210,106 @@ const Diary = () => {
     toast.success('Abriendo cliente de correo...');
   };
 
+  const handleExportDailyReport = async (date: Date) => {
+    // Convertir subtasks al formato que espera generateDailyReport
+    const tasksForReport = subtasks.map(st => ({
+      id: st.task.id,
+      title: st.task.title,
+      description: st.description || st.task.title,
+      status: st.task.status,
+      workDate: st.workDate,
+      startTime: st.startTime,
+      endTime: st.endTime,
+      timeSpentMinutes: 0, // No usado por generateDailyReport
+      project: st.task.project,
+      subtasks: []
+    }));
+
+    const report = generateDailyReport(tasksForReport, date);
+    const filename = `${format(date, 'yyyyMMdd')}_registros.txt`;
+    downloadReport(report, filename);
+    toast.success('Reporte descargado');
+  };
+
+  const handleCopyDailyReport = async (date: Date) => {
+    const tasksForReport = subtasks.map(st => ({
+      id: st.task.id,
+      title: st.task.title,
+      description: st.description || st.task.title,
+      status: st.task.status,
+      workDate: st.workDate,
+      startTime: st.startTime,
+      endTime: st.endTime,
+      timeSpentMinutes: 0,
+      project: st.task.project,
+      subtasks: []
+    }));
+
+    const report = generateDailyReport(tasksForReport, date);
+    const success = await copyToClipboard(report);
+    if (success) {
+      toast.success('Reporte copiado al portapapeles');
+    } else {
+      toast.error('Error al copiar al portapapeles');
+    }
+  };
+
+  const handleExportProgressReport = async (date: Date) => {
+    const tasksForReport = subtasks.map(st => ({
+      id: st.task.id,
+      title: st.task.title,
+      description: st.description || st.task.title,
+      status: st.task.status,
+      workDate: st.workDate,
+      startTime: st.startTime,
+      endTime: st.endTime,
+      timeSpentMinutes: 0,
+      project: st.task.project,
+      subtasks: []
+    }));
+
+    const report = generateProgressReport(tasksForReport, date);
+    const filename = `${format(date, 'yyyyMMdd')}_informe.txt`;
+    downloadReport(report, filename);
+    toast.success('Informe descargado');
+  };
+
+  const handleCopyProgressReport = async (date: Date) => {
+    const tasksForReport = subtasks.map(st => ({
+      id: st.task.id,
+      title: st.task.title,
+      description: st.description || st.task.title,
+      status: st.task.status,
+      workDate: st.workDate,
+      startTime: st.startTime,
+      endTime: st.endTime,
+      timeSpentMinutes: 0,
+      project: st.task.project,
+      subtasks: []
+    }));
+
+    const report = generateProgressReport(tasksForReport, date);
+    const success = await copyToClipboard(report);
+    if (success) {
+      toast.success('Informe copiado al portapapeles');
+    } else {
+      toast.error('Error al copiar al portapapeles');
+    }
+  };
+
   if (loading) {
     return (
-      <PageTransition>
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-white">Diario</h1>
-            <p className="text-apple-gray-600 dark:text-apple-gray-400 mt-2">
-              Registro cronológico de tus actividades
-            </p>
-          </div>
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-apple-blue"></div>
-          </div>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-white">Registros</h1>
+          <p className="text-apple-gray-600 dark:text-apple-gray-400 mt-2">
+            Registro cronológico de tus actividades
+          </p>
         </div>
-      </PageTransition>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-apple-blue"></div>
+        </div>
+      </div>
     );
   }
 
@@ -233,15 +319,21 @@ const Diary = () => {
   );
 
   return (
-    <PageTransition>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-white">Diario</h1>
-            <p className="text-apple-gray-600 dark:text-apple-gray-400 mt-2">
-              Registro cronológico de tus actividades
-            </p>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-white">Registros</h1>
+          <p className="text-apple-gray-600 dark:text-apple-gray-400 mt-2">
+            Registro cronológico de tus actividades
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <ExportMenu
+            onExportDailyReport={handleExportDailyReport}
+            onCopyDailyReport={handleCopyDailyReport}
+            onExportProgressReport={handleExportProgressReport}
+            onCopyProgressReport={handleCopyProgressReport}
+          />
           <Button
             variant="primary"
             icon={<Plus className="w-5 h-5" />}
@@ -253,8 +345,9 @@ const Diary = () => {
             Nuevo Registro
           </Button>
         </div>
+      </div>
 
-        {sortedDates.length === 0 ? (
+      {sortedDates.length === 0 ? (
           <Card>
             <CardBody>
               <div className="text-center py-12">
@@ -380,7 +473,6 @@ const Diary = () => {
             })}
           </div>
         )}
-      </div>
 
       {/* Modal para crear subtarea */}
       <SubtaskModal
@@ -390,7 +482,7 @@ const Diary = () => {
         selectedDate={selectedDate}
         token={token || ''}
       />
-    </PageTransition>
+    </div>
   );
 };
 

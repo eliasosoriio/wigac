@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 import { Button, Card, CardBody, Tag } from '../../components/ui';
-import PageTransition from '../../components/animations/PageTransition';
 import { useAuthStore } from '../../store/authStore';
 import { useProjectModalStore } from '../../store/projectModalStore';
 import axios from 'axios';
@@ -112,8 +111,7 @@ const Projects = () => {
   };
 
   return (
-    <PageTransition>
-      <div className="space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-apple-gray-100">
@@ -193,7 +191,6 @@ const Projects = () => {
         </div>
       )}
     </div>
-    </PageTransition>
   );
 };
 

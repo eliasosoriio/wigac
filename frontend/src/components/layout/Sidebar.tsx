@@ -2,10 +2,8 @@ import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
-  FolderKanban,
   CheckSquare,
   Columns,
-  Calendar,
   Clock,
   BookText,
   LogOut
@@ -22,10 +20,8 @@ const Sidebar = ({ onOpenProfile }: SidebarProps) => {
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-    { icon: FolderKanban, label: 'Proyectos', path: '/projects' },
-    { icon: CheckSquare, label: 'Tareas', path: '/tasks' },
+    { icon: CheckSquare, label: 'Registros', path: '/tasks' },
     { icon: Columns, label: 'Kanban', path: '/kanban' },
-    { icon: Calendar, label: 'Diario', path: '/diary' },
     { icon: Clock, label: 'Time Tracking', path: '/timetracking' },
     { icon: BookText, label: 'Wiki', path: '/wiki' },
   ];

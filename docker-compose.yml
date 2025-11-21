@@ -64,7 +64,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: http://localhost:8081/api
+        VITE_API_URL: /api
     container_name: wigac_frontend
     restart: always
     ports:

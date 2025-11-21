@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   CheckSquare,
   Columns,
-  Clock,
   BookText,
   LogOut
 } from 'lucide-react';
@@ -22,7 +21,6 @@ const Sidebar = ({ onOpenProfile }: SidebarProps) => {
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
     { icon: CheckSquare, label: 'Registros', path: '/tasks' },
     { icon: Columns, label: 'Kanban', path: '/kanban' },
-    { icon: Clock, label: 'Time Tracking', path: '/timetracking' },
     { icon: BookText, label: 'Wiki', path: '/wiki' },
   ];
 

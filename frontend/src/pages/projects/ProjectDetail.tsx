@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit2, Trash2, Timer, Circle, Loader2, Check, Clock, Pencil, ChevronDown, ChevronUp, FileText } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Timer, Circle, Loader2, Check, Clock, Pencil, ChevronDown, ChevronUp, FileText, Plus } from 'lucide-react';
 import { Button, Card, CardBody, CardHeader, Tag } from '../../components/ui';
 import PageTransition from '../../components/animations/PageTransition';
 import ProjectModal from '../../components/projects/ProjectModal';
 import { useAuthStore } from '../../store/authStore';
 import { useTaskModalStore } from '../../store/taskModalStore';
+import { useSubtaskModalStore } from '../../store/subtaskModalStore';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -42,7 +43,8 @@ const ProjectDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { token } = useAuthStore();
-  const { openModal: openTaskModal } = useTaskModalStore();
+  const { openModal: openTaskModal, setRefreshCallback: setTaskRefreshCallback } = useTaskModalStore();
+  const { openModal: openSubtaskModal, setRefreshCallback: setSubtaskRefreshCallback } = useSubtaskModalStore();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -77,6 +79,11 @@ const ProjectDetail = () => {
   useEffect(() => {
     fetchProject();
   }, [id]);
+
+  useEffect(() => {
+    setTaskRefreshCallback(fetchProject);
+    setSubtaskRefreshCallback(fetchProject);
+  }, []);
 
   const handleDelete = async () => {
     if (!confirm('¿Estás seguro de eliminar este proyecto?')) return;
@@ -258,7 +265,7 @@ const ProjectDetail = () => {
             <Button
               variant="secondary"
               icon={<ArrowLeft className="w-5 h-5" />}
-              onClick={() => navigate('/projects')}
+              onClick={() => navigate('/tasks')}
             >
               Volver
             </Button>
@@ -277,6 +284,21 @@ const ProjectDetail = () => {
             </div>
           </div>
           <div className="flex gap-3">
+            <Button
+              variant="primary"
+              icon={<Plus className="w-5 h-5" />}
+              onClick={() => openTaskModal({
+                title: '',
+                description: '',
+                status: 'PENDING',
+                workDate: new Date().toISOString().split('T')[0],
+                startTime: '09:00',
+                endTime: '17:00',
+                projectId: project.id
+              } as any)}
+            >
+              Nueva Tarea
+            </Button>
             <Button
               variant="secondary"
               icon={<Edit2 className="w-5 h-5" />}
@@ -388,6 +410,16 @@ const ProjectDetail = () => {
 
                           {/* Action buttons */}
                           <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-6">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openSubtaskModal(task.id);
+                              }}
+                              className="p-2.5 text-apple-gray-500 dark:text-apple-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-xl transition-all duration-200"
+                              title="Añadir Registro"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
                             <button
                               onClick={(e) => handleEditTask(task, e)}
                               className="p-2.5 text-apple-gray-500 dark:text-apple-gray-400 hover:text-apple-blue-600 dark:hover:text-apple-blue-400 hover:bg-apple-blue-50 dark:hover:bg-apple-blue-900/30 rounded-xl transition-all duration-200"

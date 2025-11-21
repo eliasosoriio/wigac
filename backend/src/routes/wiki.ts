@@ -10,12 +10,15 @@ router.use(authenticate);
 router.get('/', async (req, res) => {
   try {
     const { wikiPages: wikiRepository } = getRepositories();
-    const { projectId } = req.query;
-    const where = projectId ? { projectId: parseInt(projectId as string) } : {};
+    const { projectId, taskId } = req.query;
+
+    let where: any = {};
+    if (projectId) where.projectId = parseInt(projectId as string);
+    if (taskId) where.taskId = parseInt(taskId as string);
 
     const pages = await wikiRepository.find({
       where,
-      relations: ['project'],
+      relations: ['project', 'task'],
       order: { createdAt: 'DESC' }
     });
 
@@ -33,7 +36,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     const page = await wikiRepository.findOne({
       where: { id: parseInt(id) },
-      relations: ['project']
+      relations: ['project', 'task']
     });
 
     if (!page) {
@@ -51,18 +54,36 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { wikiPages: wikiRepository } = getRepositories();
-    const { title, content, projectId } = req.body;
-    const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
+    const { title, content, projectId, taskId } = req.body;
+
+    // Generate unique slug
+    let slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
+    let counter = 1;
+    let uniqueSlug = slug;
+
+    // Check if slug exists and make it unique
+    while (await wikiRepository.findOne({ where: { slug: uniqueSlug } })) {
+      uniqueSlug = `${slug}-${counter}`;
+      counter++;
+    }
 
     const page = wikiRepository.create({
       title,
-      slug,
+      slug: uniqueSlug,
       content,
-      projectId: projectId ? parseInt(projectId) : undefined
+      projectId: projectId ? parseInt(projectId) : undefined,
+      taskId: taskId ? parseInt(taskId) : undefined
     });
 
     await wikiRepository.save(page);
-    res.status(201).json(page);
+
+    // Fetch with relations
+    const savedPage = await wikiRepository.findOne({
+      where: { id: page.id },
+      relations: ['project', 'task']
+    });
+
+    res.status(201).json(savedPage);
   } catch (error) {
     console.error('Create wiki page error:', error);
     res.status(500).json({ message: 'Internal server error' });

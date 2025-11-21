@@ -27,8 +27,8 @@
 @layer components {
   /* Scrollbar styling */
   .scrollbar-thin::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-track {
@@ -36,16 +36,72 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    @apply bg-apple-gray-300 rounded-full;
+    @apply bg-apple-gray-300 dark:bg-dark-border rounded-full;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    @apply bg-apple-gray-400;
+    @apply bg-apple-gray-400 dark:bg-apple-gray-600;
+  }
+
+  .scrollbar-track-transparent::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .scrollbar-thumb-apple-gray-300::-webkit-scrollbar-thumb {
+    @apply bg-apple-gray-300;
+  }
+
+  .dark .scrollbar-thumb-dark-border::-webkit-scrollbar-thumb {
+    @apply bg-dark-border;
   }
 
   /* macOS-style focus ring */
   .focus-apple {
     @apply focus:outline-none focus:ring-2 focus:ring-apple-blue-500 focus:ring-opacity-50;
+  }
+
+  /* Markdown code blocks styling */
+  .prose pre {
+    overflow-x: auto;
+  }
+
+  .prose pre::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .prose pre::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+
+  .prose pre::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+  }
+
+  .prose pre::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+  }
+
+  .prose pre code {
+    display: block;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  .prose code::before,
+  .prose code::after {
+    content: none !important;
+  }
+
+  .prose :where(code):not(:where([class~="not-prose"] *)) {
+    text-decoration: none !important;
+    background-color: rgb(243 244 246);
+  }
+
+  .dark .prose :where(code):not(:where([class~="not-prose"] *)) {
+    background-color: rgb(31 41 55);
+    color: rgb(229 231 235);
   }
 }
 

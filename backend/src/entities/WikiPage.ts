@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Project } from './Project';
+import { Task } from './Task';
 
 @Entity('wiki_pages')
 export class WikiPage {
@@ -21,6 +22,13 @@ export class WikiPage {
 
   @Column({ nullable: true })
   projectId?: number;
+
+  @ManyToOne(() => Task, { nullable: true })
+  @JoinColumn({ name: 'taskId' })
+  task?: Task;
+
+  @Column({ nullable: true })
+  taskId?: number;
 
   @CreateDateColumn()
   createdAt!: Date;

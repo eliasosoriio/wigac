@@ -118,7 +118,7 @@ export const TaskModal = ({ isOpen, onClose, onSuccess, task }: TaskModalProps) 
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={task ? 'Editar Tarea' : 'Nueva Tarea'}
+      title={task?.id ? 'Editar Tarea' : 'Nueva Tarea'}
       size="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-4">

@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -27,29 +28,29 @@ export const Modal: React.FC<ModalProps> = ({
     xl: 'max-w-4xl',
   };
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <Fragment>
-          {/* Backdrop */}
+          {/* Backdrop with blur */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[9999]"
+            className="fixed inset-0 bg-black/40 backdrop-blur-md z-[9999]"
             onClick={onClose}
           />
 
           {/* Modal */}
-          <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 pointer-events-none">
+          <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
               className={clsx(
-                'glass dark:bg-dark-card dark:border dark:border-dark-border w-full rounded-apple-xl shadow-apple-xl dark:shadow-2xl pointer-events-auto',
+                'bg-white dark:bg-dark-card border border-apple-gray-200 dark:border-dark-border w-full rounded-apple-xl shadow-2xl pointer-events-auto',
                 sizes[size]
               )}
               onClick={(e) => e.stopPropagation()}
@@ -83,5 +84,11 @@ export const Modal: React.FC<ModalProps> = ({
         </Fragment>
       )}
     </AnimatePresence>
+  );
+
+  // Render modal in a portal to ensure it's on top of everything
+  return ReactDOM.createPortal(
+    modalContent,
+    document.body
   );
 };

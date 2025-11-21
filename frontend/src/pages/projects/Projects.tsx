@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
-import { Button, Card, CardBody, Tag } from '../../components/ui';
+import { Card, CardBody, Tag } from '../../components/ui';
 import { useAuthStore } from '../../store/authStore';
 import { useProjectModalStore } from '../../store/projectModalStore';
 import axios from 'axios';
@@ -121,9 +121,13 @@ const Projects = () => {
             Gestiona tus proyectos y su progreso
           </p>
         </div>
-        <Button variant="primary" icon={<Plus className="w-5 h-5" />} onClick={handleCreate}>
-          Nuevo Proyecto
-        </Button>
+        <button
+          onClick={handleCreate}
+          className="p-3 rounded-apple bg-apple-orange-500 hover:bg-apple-orange-600 text-white transition-all shadow-apple"
+          title="Nuevo Proyecto"
+        >
+          <Plus className="w-5 h-5" />
+        </button>
       </div>
 
       {loading ? (
@@ -135,9 +139,13 @@ const Projects = () => {
           <CardBody>
             <div className="text-center py-12">
               <p className="text-apple-gray-600 dark:text-apple-gray-400 mb-4">No tienes proyectos todavía</p>
-              <Button variant="primary" icon={<Plus className="w-5 h-5" />} onClick={handleCreate}>
-                Crear tu primer proyecto
-              </Button>
+              <button
+                onClick={handleCreate}
+                className="p-3 rounded-apple bg-apple-orange-500 hover:bg-apple-orange-600 text-white transition-all shadow-apple"
+                title="Crear tu primer proyecto"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
             </div>
           </CardBody>
         </Card>
@@ -158,13 +166,15 @@ const Projects = () => {
                   <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={(e) => handleEdit(project, e)}
-                      className="p-1.5 rounded-lg hover:bg-apple-blue-100 dark:hover:bg-apple-blue-900/30 text-apple-blue-600 dark:text-apple-blue-400 transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-apple-gray-200 dark:hover:bg-dark-card text-apple-gray-600 dark:text-apple-gray-400 transition-colors"
+                      title="Editar"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={(e) => handleDelete(project.id, e)}
-                      className="p-1.5 rounded-lg hover:bg-apple-red-100 dark:hover:bg-red-900/30 text-apple-red-600 dark:text-red-400 transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-apple-gray-200 dark:hover:bg-dark-card text-apple-gray-600 dark:text-apple-gray-400 transition-colors"
+                      title="Eliminar"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

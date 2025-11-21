@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { X, Clock, FileText, Calendar, FolderKanban } from 'lucide-react';
+import { Clock, FileText, Calendar, FolderKanban, Save, X } from 'lucide-react';
+import { Modal } from '../ui/Modal';
 import { Button } from '../ui';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -135,146 +136,134 @@ export const SubtaskModal = ({ isOpen, onClose, onSuccess, selectedDate, token }
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-start justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-dark-card rounded-2xl shadow-2xl max-w-2xl w-full my-8">
-        <div className="sticky top-0 bg-white dark:bg-dark-card border-b border-apple-gray-200 dark:border-dark-border px-6 py-4 flex items-center justify-between rounded-t-2xl">
-          <h2 className="text-xl font-semibold text-apple-gray-900 dark:text-white">
-            Crear Registro de Tiempo
-          </h2>
-          <button
-            onClick={handleClose}
-            className="p-2 hover:bg-apple-gray-100 dark:hover:bg-dark-hover rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5 text-apple-gray-500 dark:text-apple-gray-400" />
-          </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Crear Registro de Tiempo"
+      size="lg"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Fecha */}
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
+            <Calendar className="w-4 h-4" />
+            Fecha
+          </label>
+          <input
+            type="date"
+            value={formData.workDate}
+            onChange={(e) => setFormData({ ...formData, workDate: e.target.value })}
+            className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all"
+            required
+          />
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Fecha */}
+        {/* Proyecto */}
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
+            <FolderKanban className="w-4 h-4" />
+            Proyecto
+          </label>
+          <select
+            value={formData.projectId}
+            onChange={(e) => setFormData({ ...formData, projectId: e.target.value, taskId: '' })}
+            className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all"
+          >
+            <option value="">Todos los proyectos</option>
+            {projects.map(project => (
+              <option key={project.id} value={project.id}>
+                {project.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Tarea */}
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
+            <FileText className="w-4 h-4" />
+            Tarea
+          </label>
+          <select
+            value={formData.taskId}
+            onChange={(e) => setFormData({ ...formData, taskId: e.target.value })}
+            className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all"
+            required
+          >
+            <option value="">Selecciona una tarea...</option>
+            {filteredTasks.map(task => (
+              <option key={task.id} value={task.id}>
+                {task.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Horario */}
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
-              <Calendar className="w-4 h-4" />
-              Fecha
+              <Clock className="w-4 h-4" />
+              Hora de Inicio
             </label>
             <input
-              type="date"
-              value={formData.workDate}
-              onChange={(e) => setFormData({ ...formData, workDate: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-xl border-2 border-apple-gray-200 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-0 transition-all"
+              type="time"
+              value={formData.startTime}
+              onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+              className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all"
               required
             />
           </div>
-
-          {/* Proyecto */}
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
-              <FolderKanban className="w-4 h-4" />
-              Proyecto
+              <Clock className="w-4 h-4" />
+              Hora de Fin
             </label>
-            <select
-              value={formData.projectId}
-              onChange={(e) => setFormData({ ...formData, projectId: e.target.value, taskId: '' })}
-              className="w-full px-4 py-2.5 rounded-xl border-2 border-apple-gray-200 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-0 transition-all"
-            >
-              <option value="">Todos los proyectos</option>
-              {projects.map(project => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Tarea */}
-          <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
-              <FileText className="w-4 h-4" />
-              Tarea
-            </label>
-            <select
-              value={formData.taskId}
-              onChange={(e) => setFormData({ ...formData, taskId: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-xl border-2 border-apple-gray-200 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-0 transition-all"
+            <input
+              type="time"
+              value={formData.endTime}
+              onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+              className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all"
               required
-            >
-              <option value="">Selecciona una tarea...</option>
-              {filteredTasks.map(task => (
-                <option key={task.id} value={task.id}>
-                  {task.title}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Horario */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
-                <Clock className="w-4 h-4" />
-                Hora de Inicio
-              </label>
-              <input
-                type="time"
-                value={formData.startTime}
-                onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border-2 border-apple-gray-200 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-0 transition-all"
-                required
-              />
-            </div>
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
-                <Clock className="w-4 h-4" />
-                Hora de Fin
-              </label>
-              <input
-                type="time"
-                value={formData.endTime}
-                onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border-2 border-apple-gray-200 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-0 transition-all"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Descripción */}
-          <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
-              <FileText className="w-4 h-4" />
-              Descripción (opcional)
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-              className="w-full px-4 py-2.5 rounded-xl border-2 border-apple-gray-200 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-0 transition-all resize-none"
-              placeholder="Describe en qué trabajaste..."
             />
           </div>
+        </div>
 
-          {/* Botones */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={handleClose}
-              className="flex-1"
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={loading}
-              className="flex-1"
-            >
-              {loading ? 'Creando...' : 'Crear Registro'}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+        {/* Descripción */}
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
+            <FileText className="w-4 h-4" />
+            Descripción (opcional)
+          </label>
+          <textarea
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            rows={3}
+            className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all resize-none"
+            placeholder="Describe en qué trabajaste..."
+          />
+        </div>
+
+        {/* Botones */}
+        <div className="flex gap-3 pt-4">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="p-3 rounded-apple bg-apple-gray-900 hover:bg-apple-gray-800 dark:bg-apple-gray-800 dark:hover:bg-apple-gray-700 text-white transition-all"
+            title="Cancelar"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          <Button
+            type="submit"
+            variant="primary"
+            isLoading={loading}
+            icon={<Save className="w-4 h-4" />}
+            title="Crear registro"
+          />
+        </div>
+      </form>
+    </Modal>
   );
 };

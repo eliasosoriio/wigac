@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Save, ArrowLeft, FolderKanban, CheckSquare } from 'lucide-react';
+import { Save, ArrowLeft, FolderKanban, CheckSquare, Link2, Unlink } from 'lucide-react';
 import { Button, Card, CardBody } from '../../components/ui';
 import PageTransition from '../../components/animations/PageTransition';
 import { useAuthStore } from '../../store/authStore';
@@ -36,11 +36,23 @@ const WikiEditor = () => {
   const [content, setContent] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [syncScroll, setSyncScroll] = useState(true);
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const isScrollingRef = useRef(false);
+  const scrollTimeoutRef = useRef<number>();
 
   useEffect(() => {
     if (id) {
       fetchPage();
     }
+
+    // Cleanup al desmontar
+    return () => {
+      if (scrollTimeoutRef.current) {
+        window.cancelAnimationFrame(scrollTimeoutRef.current);
+      }
+    };
   }, [id]);
 
   useEffect(() => {
@@ -54,6 +66,91 @@ const WikiEditor = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [title, content]);
+
+  // Sincronizar scroll cuando cambia el contenido (al escribir)
+  useEffect(() => {
+    if (!syncScroll || !editorRef.current || !previewRef.current) return;
+
+    const editor = editorRef.current;
+    const preview = previewRef.current;
+
+    // Mantener la posición de scroll relativa después de cambios de contenido
+    const editorScrollableHeight = editor.scrollHeight - editor.clientHeight;
+    const scrollPercentage = editorScrollableHeight > 0 ? editor.scrollTop / editorScrollableHeight : 0;
+
+    const previewScrollableHeight = preview.scrollHeight - preview.clientHeight;
+    const targetScrollTop = scrollPercentage * previewScrollableHeight;
+
+    // Si el usuario está escribiendo cerca del final, hacer scroll automático
+    const isNearBottom = editor.scrollTop > editorScrollableHeight * 0.9;
+
+    if (isNearBottom || scrollPercentage > 0.95) {
+      // Scroll al final en ambos paneles
+      requestAnimationFrame(() => {
+        editor.scrollTop = editor.scrollHeight;
+        preview.scrollTop = preview.scrollHeight;
+      });
+    } else {
+      // Mantener posición relativa
+      requestAnimationFrame(() => {
+        preview.scrollTop = targetScrollTop;
+      });
+    }
+  }, [content, syncScroll]);
+
+  const handleEditorScroll = () => {
+    if (!syncScroll || isScrollingRef.current || !editorRef.current || !previewRef.current) return;
+
+    if (scrollTimeoutRef.current) {
+      window.cancelAnimationFrame(scrollTimeoutRef.current);
+    }
+
+    isScrollingRef.current = true;
+    const editor = editorRef.current;
+    const preview = previewRef.current;
+
+    // Calcular posición relativa más precisa
+    const editorScrollableHeight = editor.scrollHeight - editor.clientHeight;
+    const scrollPercentage = editorScrollableHeight > 0 ? editor.scrollTop / editorScrollableHeight : 0;
+
+    const previewScrollableHeight = preview.scrollHeight - preview.clientHeight;
+    const targetScrollTop = scrollPercentage * previewScrollableHeight;
+
+    // Usar requestAnimationFrame para scroll suave
+    scrollTimeoutRef.current = window.requestAnimationFrame(() => {
+      if (preview) {
+        preview.scrollTop = targetScrollTop;
+      }
+      isScrollingRef.current = false;
+    });
+  };
+
+  const handlePreviewScroll = () => {
+    if (!syncScroll || isScrollingRef.current || !editorRef.current || !previewRef.current) return;
+
+    if (scrollTimeoutRef.current) {
+      window.cancelAnimationFrame(scrollTimeoutRef.current);
+    }
+
+    isScrollingRef.current = true;
+    const editor = editorRef.current;
+    const preview = previewRef.current;
+
+    // Calcular posición relativa más precisa
+    const previewScrollableHeight = preview.scrollHeight - preview.clientHeight;
+    const scrollPercentage = previewScrollableHeight > 0 ? preview.scrollTop / previewScrollableHeight : 0;
+
+    const editorScrollableHeight = editor.scrollHeight - editor.clientHeight;
+    const targetScrollTop = scrollPercentage * editorScrollableHeight;
+
+    // Usar requestAnimationFrame para scroll suave
+    scrollTimeoutRef.current = window.requestAnimationFrame(() => {
+      if (editor) {
+        editor.scrollTop = targetScrollTop;
+      }
+      isScrollingRef.current = false;
+    });
+  };
 
   const fetchPage = async () => {
     try {
@@ -111,13 +208,13 @@ const WikiEditor = () => {
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <Button
-                variant="ghost"
-                icon={<ArrowLeft className="w-5 h-5" />}
+              <button
                 onClick={() => navigate('/wiki')}
+                className="p-3 rounded-apple bg-apple-orange-500 hover:bg-apple-orange-600 text-white transition-all shadow-apple"
+                title="Volver"
               >
-                Volver
-              </Button>
+                <ArrowLeft className="w-5 h-5" />
+              </button>
               {page?.project && (
                 <span className="inline-flex items-center gap-1 text-sm text-apple-gray-600 dark:text-apple-gray-400">
                   <FolderKanban className="w-4 h-4" />
@@ -144,9 +241,30 @@ const WikiEditor = () => {
             icon={<Save className="w-5 h-5" />}
             onClick={handleSave}
             disabled={saving}
-          >
-            {saving ? 'Guardando...' : 'Guardar'}
-          </Button>
+            title={saving ? 'Guardando...' : 'Guardar'}
+          />
+        </div>
+
+        <div className="mb-4 flex items-center justify-end">
+          <label className="flex items-center gap-2 cursor-pointer text-sm text-apple-gray-700 dark:text-apple-gray-300">
+            <input
+              type="checkbox"
+              checked={syncScroll}
+              onChange={(e) => setSyncScroll(e.target.checked)}
+              className="rounded border-apple-gray-300 dark:border-dark-border text-apple-blue-500 focus:ring-apple-blue-500 focus:ring-offset-0"
+            />
+            {syncScroll ? (
+              <>
+                <Link2 className="w-4 h-4" />
+                <span>Scroll sincronizado</span>
+              </>
+            ) : (
+              <>
+                <Unlink className="w-4 h-4" />
+                <span>Scroll independiente</span>
+              </>
+            )}
+          </label>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -162,8 +280,10 @@ const WikiEditor = () => {
                 </p>
               </div>
               <textarea
+                ref={editorRef}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
+                onScroll={handleEditorScroll}
                 className="w-full h-[600px] p-4 font-mono text-sm bg-apple-gray-50 dark:bg-dark-hover border border-apple-gray-300 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-apple-blue-500 focus:border-transparent resize-none text-apple-gray-900 dark:text-apple-gray-100 scrollbar-thin scrollbar-thumb-apple-gray-300 dark:scrollbar-thumb-dark-border scrollbar-track-transparent"
                 placeholder="Escribe tu contenido en Markdown..."
               />
@@ -178,7 +298,11 @@ const WikiEditor = () => {
                   Vista Previa
                 </h3>
               </div>
-              <div className="h-[600px] overflow-y-auto p-4 bg-white dark:bg-dark-card rounded-lg border border-apple-gray-200 dark:border-dark-border scrollbar-thin scrollbar-thumb-apple-gray-300 dark:scrollbar-thumb-dark-border scrollbar-track-transparent">
+              <div
+                ref={previewRef}
+                onScroll={handlePreviewScroll}
+                className="h-[600px] overflow-y-auto p-4 bg-white dark:bg-dark-card rounded-lg border border-apple-gray-200 dark:border-dark-border scrollbar-thin scrollbar-thumb-apple-gray-300 dark:scrollbar-thumb-dark-border scrollbar-track-transparent"
+              >
                 <article className="prose prose-sm dark:prose-invert max-w-none
                   prose-headings:font-semibold
                   prose-h1:text-3xl prose-h1:mb-4

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Edit2, Trash2, Timer, Circle, Loader2, Check, Clock, Pencil, ChevronDown, ChevronUp, FileText, Plus } from 'lucide-react';
-import { Button, Card, CardBody, CardHeader, Tag } from '../../components/ui';
+import { Card, CardBody, CardHeader, Tag } from '../../components/ui';
 import PageTransition from '../../components/animations/PageTransition';
 import ProjectModal from '../../components/projects/ProjectModal';
 import { useAuthStore } from '../../store/authStore';
@@ -162,6 +162,20 @@ const ProjectDetail = () => {
     }
   };
 
+  const handleDeleteSubtask = async (subtaskId: number) => {
+    if (!confirm('¿Estás seguro de eliminar este registro de tiempo?')) return;
+
+    try {
+      await axios.delete(`${API_URL}/subtasks/${subtaskId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Registro eliminado');
+      fetchProject();
+    } catch (error) {
+      toast.error('Error al eliminar registro');
+    }
+  };
+
   const getStatusButton = (task: Task, status: string) => {
     const isActive = task.status === status;
     const configs = {
@@ -262,13 +276,13 @@ const ProjectDetail = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button
-              variant="secondary"
-              icon={<ArrowLeft className="w-5 h-5" />}
+            <button
               onClick={() => navigate('/tasks')}
+              className="p-3 rounded-apple bg-apple-orange-500 hover:bg-apple-orange-600 text-white transition-all shadow-apple"
+              title="Volver"
             >
-              Volver
-            </Button>
+              <ArrowLeft className="w-5 h-5" />
+            </button>
             <div>
               <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-apple-gray-100">
                 {project.name}
@@ -283,10 +297,8 @@ const ProjectDetail = () => {
               </div>
             </div>
           </div>
-          <div className="flex gap-3">
-            <Button
-              variant="primary"
-              icon={<Plus className="w-5 h-5" />}
+          <div className="flex gap-2">
+            <button
               onClick={() => openTaskModal({
                 title: '',
                 description: '',
@@ -296,23 +308,25 @@ const ProjectDetail = () => {
                 endTime: '17:00',
                 projectId: project.id
               } as any)}
+              className="p-3 rounded-apple bg-apple-orange-500 hover:bg-apple-orange-600 text-white transition-all shadow-apple"
+              title="Nueva Tarea"
             >
-              Nueva Tarea
-            </Button>
-            <Button
-              variant="secondary"
-              icon={<Edit2 className="w-5 h-5" />}
+              <Plus className="w-5 h-5" />
+            </button>
+            <button
               onClick={() => setShowModal(true)}
+              className="p-3 rounded-apple bg-apple-gray-100 hover:bg-apple-gray-200 dark:bg-dark-hover dark:hover:bg-dark-card text-apple-gray-700 dark:text-apple-gray-300 transition-all shadow-apple"
+              title="Editar Proyecto"
             >
-              Editar
-            </Button>
-            <Button
-              variant="danger"
-              icon={<Trash2 className="w-5 h-5" />}
+              <Edit2 className="w-5 h-5" />
+            </button>
+            <button
               onClick={handleDelete}
+              className="p-3 rounded-apple bg-apple-gray-100 hover:bg-apple-gray-200 dark:bg-dark-hover dark:hover:bg-dark-card text-apple-gray-700 dark:text-apple-gray-300 transition-all shadow-apple"
+              title="Eliminar Proyecto"
             >
-              Eliminar
-            </Button>
+              <Trash2 className="w-5 h-5" />
+            </button>
           </div>
         </div>
 
@@ -415,21 +429,21 @@ const ProjectDetail = () => {
                                 e.stopPropagation();
                                 openSubtaskModal(task.id);
                               }}
-                              className="p-2.5 text-apple-gray-500 dark:text-apple-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-xl transition-all duration-200"
+                              className="p-2.5 text-apple-gray-500 dark:text-apple-gray-400 hover:text-apple-gray-700 dark:hover:text-apple-gray-200 hover:bg-apple-gray-100 dark:hover:bg-dark-card rounded-xl transition-all duration-200"
                               title="Añadir Registro"
                             >
                               <Plus className="w-4 h-4" />
                             </button>
                             <button
                               onClick={(e) => handleEditTask(task, e)}
-                              className="p-2.5 text-apple-gray-500 dark:text-apple-gray-400 hover:text-apple-blue-600 dark:hover:text-apple-blue-400 hover:bg-apple-blue-50 dark:hover:bg-apple-blue-900/30 rounded-xl transition-all duration-200"
+                              className="p-2.5 text-apple-gray-500 dark:text-apple-gray-400 hover:text-apple-gray-700 dark:hover:text-apple-gray-200 hover:bg-apple-gray-100 dark:hover:bg-dark-card rounded-xl transition-all duration-200"
                               title="Editar"
                             >
                               <Pencil className="w-4 h-4" />
                             </button>
                             <button
                               onClick={(e) => handleDeleteTask(task.id, e)}
-                              className="p-2.5 text-apple-gray-500 dark:text-apple-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-all duration-200"
+                              className="p-2.5 text-apple-gray-500 dark:text-apple-gray-400 hover:text-apple-gray-700 dark:hover:text-apple-gray-200 hover:bg-apple-gray-100 dark:hover:bg-dark-card rounded-xl transition-all duration-200"
                               title="Eliminar"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -497,6 +511,22 @@ const ProjectDetail = () => {
                                               {calculateDuration(subtask.startTime, subtask.endTime)}
                                             </span>
                                           </div>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <button
+                                            onClick={() => openSubtaskModal(task.id, subtask as any)}
+                                            className="p-1.5 text-apple-gray-400 hover:text-apple-gray-700 dark:hover:text-apple-gray-200 hover:bg-apple-gray-100 dark:hover:bg-dark-card rounded-apple transition-all"
+                                            title="Editar registro"
+                                          >
+                                            <Pencil className="w-3.5 h-3.5" />
+                                          </button>
+                                          <button
+                                            onClick={() => handleDeleteSubtask(subtask.id)}
+                                            className="p-1.5 text-apple-gray-400 hover:text-apple-gray-700 dark:hover:text-apple-gray-200 hover:bg-apple-gray-100 dark:hover:bg-dark-card rounded-apple transition-all"
+                                            title="Eliminar registro"
+                                          >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                          </button>
                                         </div>
                                       </div>
                                     </div>

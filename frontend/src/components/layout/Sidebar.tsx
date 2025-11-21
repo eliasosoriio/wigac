@@ -29,13 +29,12 @@ const Sidebar = ({ onOpenProfile }: SidebarProps) => {
       {/* Logo */}
       <NavLink
         to="/"
-        className="p-6 border-b border-apple-gray-200 dark:border-dark-border flex items-center justify-center hover:bg-apple-gray-50 dark:hover:bg-dark-hover transition-colors"
+        className="p-6 border-b border-apple-gray-200 dark:border-dark-border flex items-center justify-center hover:bg-apple-gray-50 dark:hover:bg-dark-hover transition-colors group"
       >
-        <img
-          src="/logo.jpg"
-          alt="Wigac"
-          className="h-12 w-auto text-apple-gray-900"
-        />
+        <h1 className="text-3xl font-black tracking-tight">
+          <span className="text-apple-orange-500 group-hover:text-apple-orange-600 transition-colors">W</span>
+          <span className="text-apple-gray-900 dark:text-apple-gray-100">igac</span>
+        </h1>
       </NavLink>
 
       {/* Navigation */}
@@ -54,7 +53,7 @@ const Sidebar = ({ onOpenProfile }: SidebarProps) => {
                 clsx(
                   'flex items-center gap-3 px-4 py-3 rounded-apple transition-all duration-200',
                   isActive
-                    ? 'bg-apple-blue-500 text-white shadow-apple'
+                    ? 'bg-apple-orange-500 text-white shadow-apple'
                     : 'text-apple-gray-700 dark:text-apple-gray-300 hover:bg-apple-gray-100 dark:hover:bg-dark-hover'
                 )
               }
@@ -72,7 +71,7 @@ const Sidebar = ({ onOpenProfile }: SidebarProps) => {
           onClick={onOpenProfile}
           className="w-full flex items-center gap-3 px-4 py-3 mb-2 rounded-apple hover:bg-apple-gray-100 dark:hover:bg-dark-hover transition-all duration-200 cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-full bg-apple-blue-500 flex items-center justify-center text-white font-semibold">
+          <div className="w-10 h-10 rounded-full bg-apple-orange-500 flex items-center justify-center text-white font-semibold">
             {user?.name.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0 text-left">

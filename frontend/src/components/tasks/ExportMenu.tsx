@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { FileDown, Copy, FileText, Calendar, ChevronDown } from 'lucide-react';
-import { Button } from '../ui';
 
 interface ExportMenuProps {
   onExportDailyReport: (date: Date) => void;
@@ -37,14 +36,14 @@ export const ExportMenu = ({
 
   return (
     <div className="relative" ref={menuRef}>
-      <Button
-        variant="secondary"
-        icon={<FileDown className="w-5 h-5" />}
+      <button
         onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 p-3 rounded-apple bg-apple-gray-900 hover:bg-apple-gray-800 dark:bg-apple-gray-800 dark:hover:bg-apple-gray-700 text-white transition-all shadow-apple"
+        title="Exportar"
       >
-        <span className="hidden sm:inline">Exportar</span>
-        <ChevronDown className={`w-4 h-4 ml-1 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </Button>
+        <FileDown className="w-5 h-5" />
+        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-dark-card border border-apple-gray-200 dark:border-dark-border rounded-xl shadow-lg z-50">

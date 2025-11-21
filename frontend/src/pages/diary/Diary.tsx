@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Clock, ChevronDown, ChevronUp, Mail, Plus } from 'lucide-react';
-import { Card, CardBody, Button } from '../../components/ui';
+import { Calendar, ChevronDown, ChevronUp, Mail, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Card, CardBody } from '../../components/ui';
 import { SubtaskModal } from '../../components/diary/SubtaskModal';
 import { ExportMenu } from '../../components/tasks/ExportMenu';
 import { useAuthStore } from '../../store/authStore';
+import { useSubtaskModalStore } from '../../store/subtaskModalStore';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { format, parseISO } from 'date-fns';
@@ -35,6 +36,7 @@ interface GroupedSubtasks {
 
 const Diary = () => {
   const { token, user } = useAuthStore();
+  const { openModal, setRefreshCallback } = useSubtaskModalStore();
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
@@ -43,6 +45,8 @@ const Diary = () => {
 
   useEffect(() => {
     fetchSubtasks();
+    // Registrar el callback de refresh para que se actualice cuando se edite desde el modal global
+    setRefreshCallback(fetchSubtasks);
   }, []);
 
   const fetchSubtasks = async () => {
@@ -104,6 +108,42 @@ const Diary = () => {
       newExpanded.add(date);
     }
     setExpandedDates(newExpanded);
+  };
+
+  const handleEditSubtask = (subtask: Subtask, e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Calcular timeSpentMinutes
+    const [startHours, startMinutes] = subtask.startTime.split(':').map(Number);
+    const [endHours, endMinutes] = subtask.endTime.split(':').map(Number);
+    const timeSpentMinutes = (endHours * 60 + endMinutes) - (startHours * 60 + startMinutes);
+
+    openModal(subtask.task.id, {
+      id: subtask.id,
+      description: subtask.description || '',
+      workDate: subtask.workDate,
+      startTime: subtask.startTime,
+      endTime: subtask.endTime,
+      taskId: subtask.task.id,
+      timeSpentMinutes
+    });
+  };
+
+  const handleDeleteSubtask = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm('¿Eliminar este registro?')) return;
+
+    try {
+      const authData = localStorage.getItem('auth-storage');
+      const currentToken = token || (authData ? JSON.parse(authData).state?.token : null);
+
+      await axios.delete(`${API_URL}/subtasks/${id}`, {
+        headers: { Authorization: `Bearer ${currentToken}` }
+      });
+      toast.success('Registro eliminado');
+      fetchSubtasks();
+    } catch (error) {
+      toast.error('Error al eliminar registro');
+    }
   };
 
   const calculateDuration = (startTime: string, endTime: string): string => {
@@ -334,16 +374,16 @@ const Diary = () => {
             onExportProgressReport={handleExportProgressReport}
             onCopyProgressReport={handleCopyProgressReport}
           />
-          <Button
-            variant="primary"
-            icon={<Plus className="w-5 h-5" />}
+          <button
             onClick={() => {
               setSelectedDate(new Date().toISOString().split('T')[0]);
               setIsModalOpen(true);
             }}
+            className="p-3 rounded-apple bg-apple-orange-500 hover:bg-apple-orange-600 text-white transition-all shadow-apple"
+            title="Nuevo Registro"
           >
-            Nuevo Registro
-          </Button>
+            <Plus className="w-5 h-5" />
+          </button>
         </div>
       </div>
 
@@ -385,30 +425,28 @@ const Diary = () => {
                     </button>
 
                     <div className="flex items-center gap-3">
-                      <Button
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedDate(date);
                           setIsModalOpen(true);
                         }}
-                        variant="primary"
-                        className="flex items-center gap-2 px-4 py-2"
+                        className="p-2.5 rounded-apple bg-apple-orange-500 hover:bg-apple-orange-600 text-white transition-all"
+                        title="Añadir registro"
                       >
                         <Plus className="w-4 h-4" />
-                        <span>Añadir</span>
-                      </Button>
+                      </button>
 
-                      <Button
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
                           generateParteEmail(date);
                         }}
-                        variant="secondary"
-                        className="flex items-center gap-2 px-4 py-2"
+                        className="p-2.5 rounded-apple bg-apple-gray-100 hover:bg-apple-gray-200 dark:bg-dark-hover dark:hover:bg-dark-card text-apple-gray-700 dark:text-apple-gray-300 transition-all"
+                        title="Generar parte"
                       >
                         <Mail className="w-4 h-4" />
-                        <span>Parte</span>
-                      </Button>
+                      </button>
 
                       <button onClick={() => toggleDate(date)}>
                         {isExpanded ? (
@@ -421,51 +459,81 @@ const Diary = () => {
                   </div>
 
                   {isExpanded && (
-                    <CardBody className="space-y-3 p-4">
-                      {daySubtasks.map(subtask => (
-                        <div
-                          key={subtask.id}
-                          className="flex items-start gap-4 p-4 bg-white dark:bg-dark-bg rounded-lg border border-apple-gray-200 dark:border-dark-border hover:shadow-md transition-shadow"
-                        >
-                          <div className="flex-shrink-0 flex flex-col items-center gap-1">
-                            <Clock className="w-5 h-5 text-apple-blue dark:text-blue-400" />
-                            <span className="text-xs font-medium text-apple-gray-600 dark:text-apple-gray-400">
-                              {subtask.startTime}
-                            </span>
-                            <div className="w-px h-4 bg-apple-gray-300 dark:bg-dark-border"></div>
-                            <span className="text-xs font-medium text-apple-gray-600 dark:text-apple-gray-400">
-                              {subtask.endTime}
-                            </span>
-                            <span className="text-xs text-apple-gray-500 dark:text-apple-gray-500 mt-1">
-                              {calculateDuration(subtask.startTime, subtask.endTime)}
-                            </span>
-                          </div>
-
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-3 mb-2">
-                              <div className="flex-1">
-                                <h4 className="font-medium text-apple-gray-900 dark:text-white">
-                                  {subtask.task.title}
-                                </h4>
-                                {subtask.task.project && (
-                                  <p className="text-sm text-apple-gray-500 dark:text-apple-gray-400 mt-1">
-                                    {subtask.task.project.name}
-                                  </p>
-                                )}
+                    <CardBody className="p-0">
+                      <div className="divide-y divide-apple-gray-100 dark:divide-dark-border">
+                        {daySubtasks.map(subtask => (
+                          <div
+                            key={subtask.id}
+                            className="group relative flex hover:bg-apple-gray-50 dark:hover:bg-dark-hover transition-colors duration-150"
+                          >
+                            {/* Sección de tiempo - lado izquierdo */}
+                            <div className="flex-shrink-0 w-32 px-6 py-4 border-r border-apple-gray-100 dark:border-dark-border bg-white dark:bg-dark-card">
+                              <div className="flex flex-col gap-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-semibold text-apple-gray-900 dark:text-white tabular-nums">
+                                    {subtask.startTime.substring(0, 5)}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-semibold text-apple-gray-500 dark:text-apple-gray-400 tabular-nums">
+                                    {subtask.endTime.substring(0, 5)}
+                                  </span>
+                                </div>
+                                <div className="mt-1 pt-1 border-t border-apple-gray-200 dark:border-dark-border">
+                                  <span className="text-xs font-bold text-apple-gray-600 dark:text-apple-gray-400 tabular-nums">
+                                    {calculateDuration(subtask.startTime, subtask.endTime)}
+                                  </span>
+                                </div>
                               </div>
-                              <span className={`px-2 py-1 rounded-md text-xs font-medium whitespace-nowrap ${statusColors[subtask.task.status]}`}>
-                                {statusLabels[subtask.task.status]}
-                              </span>
                             </div>
 
-                            {subtask.description && (
-                              <p className="text-sm text-apple-gray-600 dark:text-apple-gray-400 mt-2">
-                                {subtask.description}
-                              </p>
-                            )}
+                            {/* Contenido - lado derecho */}
+                            <div className="flex-1 px-6 py-4">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-base font-medium text-apple-gray-900 dark:text-white mb-1">
+                                    {subtask.task.title}
+                                  </h4>
+
+                                  {subtask.task.project && (
+                                    <p className="text-sm text-apple-gray-500 dark:text-apple-gray-400 mb-2">
+                                      {subtask.task.project.name}
+                                    </p>
+                                  )}
+
+                                  {subtask.description && (
+                                    <p className="text-sm text-apple-gray-600 dark:text-apple-gray-400 leading-relaxed mt-2">
+                                      {subtask.description}
+                                    </p>
+                                  )}
+                                </div>
+
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${statusColors[subtask.task.status]}`}>
+                                    {statusLabels[subtask.task.status]}
+                                  </span>
+
+                                  <button
+                                    onClick={(e) => handleEditSubtask(subtask, e)}
+                                    className="p-1.5 hover:bg-apple-blue-100 dark:hover:bg-apple-blue-900/30 text-apple-blue-600 dark:text-apple-blue-400 rounded transition-colors"
+                                    title="Editar registro"
+                                  >
+                                    <Pencil className="w-3.5 h-3.5" />
+                                  </button>
+
+                                  <button
+                                    onClick={(e) => handleDeleteSubtask(subtask.id, e)}
+                                    className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 rounded transition-colors"
+                                    title="Eliminar registro"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </CardBody>
                   )}
                 </Card>

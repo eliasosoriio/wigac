@@ -167,16 +167,18 @@ export function SubtaskList({ taskId, initialSubtasks = [], filterDate, onUpdate
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 transition-opacity">
                     <button
                       onClick={(e) => handleEdit(subtask, e)}
                       className="p-1.5 hover:bg-apple-blue-100 dark:hover:bg-apple-blue-900/30 text-apple-blue-600 dark:text-apple-blue-400 rounded transition-colors"
+                      title="Editar registro"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={(e) => handleDelete(subtask.id, e)}
                       className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 rounded transition-colors"
+                      title="Eliminar registro"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

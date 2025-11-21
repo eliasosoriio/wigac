@@ -178,28 +178,28 @@ export const TaskModal = ({ isOpen, onClose, onSuccess, task }: TaskModalProps) 
               <option value="PENDING">Pendiente</option>
               <option value="IN_PROGRESS">En Proceso</option>
               <option value="COMPLETED">Completada</option>
+              <option value="TRANSVERSAL">Transversal</option>
             </select>
           </div>
         </div>
 
         <div className="flex gap-3 justify-end pt-4">
-          <Button
+          <button
             type="button"
-            variant="secondary"
             onClick={onClose}
             disabled={loading}
-            icon={<X className="w-4 h-4" />}
+            className="p-3 rounded-apple bg-apple-gray-900 hover:bg-apple-gray-800 dark:bg-apple-gray-800 dark:hover:bg-apple-gray-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Cancelar"
           >
-            Cancelar
-          </Button>
+            <X className="w-4 h-4" />
+          </button>
           <Button
             type="submit"
             variant="primary"
             isLoading={loading}
             icon={<Save className="w-4 h-4" />}
-          >
-            {task ? 'Actualizar' : 'Crear'}
-          </Button>
+            title={task ? 'Actualizar tarea' : 'Crear tarea'}
+          />
         </div>
       </form>
     </Modal>

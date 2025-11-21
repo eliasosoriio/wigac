@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FileText, FolderKanban, ChevronRight, ChevronDown, Trash2, Edit2, CheckSquare } from 'lucide-react';
-import { Button, Card, CardBody } from '../../components/ui';
+import { Plus, FileText, FolderKanban, ChevronRight, ChevronDown, Trash2, Edit2, CheckSquare, X, Save, ChevronUp } from 'lucide-react';
+import { Card, CardBody } from '../../components/ui';
+import { Modal } from '../../components/ui/Modal';
+import { Button } from '../../components/ui';
 import PageTransition from '../../components/animations/PageTransition';
 import { useAuthStore } from '../../store/authStore';
 import axios from 'axios';
@@ -48,6 +50,7 @@ const Wiki = () => {
   const [loading, setLoading] = useState(true);
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [expandedTasks, setExpandedTasks] = useState<Set<number>>(new Set());
   const [newPageTitle, setNewPageTitle] = useState('');
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
   const [selectedTask, setSelectedTask] = useState<number | null>(null);
@@ -93,7 +96,7 @@ const Wiki = () => {
         type: 'project',
         name: 'Sin clasificar',
         pages: orphanPages,
-        expanded: true
+        expanded: false
       });
     }
 
@@ -120,7 +123,7 @@ const Wiki = () => {
           projectId: project.id,
           pages: projectPages,
           tasks: taskNodes,
-          expanded: true
+          expanded: false
         });
       }
     });
@@ -141,6 +144,18 @@ const Wiki = () => {
       });
     };
     setTreeData(updateTree(treeData));
+  };
+
+  const toggleTaskPages = (taskId: number) => {
+    setExpandedTasks(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId);
+      } else {
+        newSet.add(taskId);
+      }
+      return newSet;
+    });
   };
 
   const handleCreatePage = async () => {
@@ -219,7 +234,60 @@ const Wiki = () => {
           </span>
         </div>
 
-        {node.pages && node.pages.length > 0 && (
+        {node.pages && node.pages.length > 0 && node.type === 'task' && (
+          <div style={{ marginLeft: '20px' }}>
+            <button
+              onClick={() => toggleTaskPages(node.taskId!)}
+              className="flex items-center gap-2 py-1.5 px-3 mb-1 hover:bg-apple-gray-100 dark:hover:bg-dark-hover rounded-lg transition-colors w-full text-left"
+            >
+              {expandedTasks.has(node.taskId!) ? (
+                <ChevronUp className="w-3.5 h-3.5 text-apple-gray-500" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5 text-apple-gray-500" />
+              )}
+              <span className="text-xs font-medium text-apple-gray-600 dark:text-apple-gray-400">
+                Páginas ({node.pages.length})
+              </span>
+            </button>
+            {expandedTasks.has(node.taskId!) && (
+              <div className="space-y-0.5">
+                {node.pages.map(page => (
+                  <div
+                    key={page.id}
+                    className="flex items-center gap-2 py-2 px-3 hover:bg-apple-gray-100 dark:hover:bg-dark-hover rounded-lg transition-colors cursor-pointer group"
+                    onClick={() => navigate(`/wiki/${page.id}`)}
+                  >
+                    <FileText className="w-4 h-4 text-apple-gray-400 dark:text-apple-gray-500" />
+                    <span className="flex-1 text-sm text-apple-gray-600 dark:text-apple-gray-400">
+                      {page.title}
+                    </span>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/wiki/${page.id}`);
+                        }}
+                        className="p-1 hover:bg-apple-gray-200 dark:hover:bg-dark-card text-apple-gray-600 dark:text-apple-gray-400 rounded transition-colors"
+                        title="Editar"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={(e) => handleDeletePage(page.id, e)}
+                        className="p-1 hover:bg-apple-gray-200 dark:hover:bg-dark-card text-apple-gray-600 dark:text-apple-gray-400 rounded transition-colors"
+                        title="Eliminar"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {node.pages && node.pages.length > 0 && node.type !== 'task' && (
           <div style={{ marginLeft: '20px' }}>
             {node.pages.map(page => (
               <div
@@ -237,14 +305,14 @@ const Wiki = () => {
                       e.stopPropagation();
                       navigate(`/wiki/${page.id}`);
                     }}
-                    className="p-1 hover:bg-apple-blue-100 dark:hover:bg-apple-blue-900/30 text-apple-blue-600 dark:text-apple-blue-400 rounded transition-colors"
+                    className="p-1 hover:bg-apple-gray-200 dark:hover:bg-dark-card text-apple-gray-600 dark:text-apple-gray-400 rounded transition-colors"
                     title="Editar"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={(e) => handleDeletePage(page.id, e)}
-                    className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 rounded transition-colors"
+                    className="p-1 hover:bg-apple-gray-200 dark:hover:bg-dark-card text-apple-gray-600 dark:text-apple-gray-400 rounded transition-colors"
                     title="Eliminar"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -280,13 +348,13 @@ const Wiki = () => {
               Documentación en Markdown organizada por proyectos y tareas
             </p>
           </div>
-          <Button
-            variant="primary"
-            icon={<Plus className="w-5 h-5" />}
+          <button
             onClick={() => setShowModal(true)}
+            className="p-3 rounded-apple bg-apple-orange-500 hover:bg-apple-orange-600 text-white transition-all shadow-apple"
+            title="Nueva Página"
           >
-            Nueva Página
-          </Button>
+            <Plus className="w-5 h-5" />
+          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -382,94 +450,99 @@ const Wiki = () => {
         </div>
 
         {/* Modal para crear nueva página */}
-        {showModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-dark-card rounded-2xl shadow-xl max-w-md w-full p-6">
-              <h2 className="text-xl font-semibold text-apple-gray-900 dark:text-apple-gray-100 mb-4">
-                Nueva Página Wiki
-              </h2>
+        <Modal
+          isOpen={showModal}
+          onClose={() => {
+            setShowModal(false);
+            setNewPageTitle('');
+            setSelectedProject(null);
+            setSelectedTask(null);
+          }}
+          title="Nueva Página Wiki"
+          size="md"
+        >
+          <form onSubmit={(e) => { e.preventDefault(); handleCreatePage(); }} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
+                Título
+              </label>
+              <input
+                type="text"
+                value={newPageTitle}
+                onChange={(e) => setNewPageTitle(e.target.value)}
+                className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all"
+                placeholder="Título de la página"
+                autoFocus
+                required
+              />
+            </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
-                    Título
-                  </label>
-                  <input
-                    type="text"
-                    value={newPageTitle}
-                    onChange={(e) => setNewPageTitle(e.target.value)}
-                    className="w-full px-4 py-2 border border-apple-gray-300 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-apple-blue-500 focus:border-transparent bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100"
-                    placeholder="Título de la página"
-                    autoFocus
-                  />
-                </div>
+            <div>
+              <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
+                Proyecto (opcional)
+              </label>
+              <select
+                value={selectedProject || ''}
+                onChange={(e) => {
+                  setSelectedProject(e.target.value ? parseInt(e.target.value) : null);
+                  setSelectedTask(null);
+                }}
+                className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all"
+              >
+                <option value="">Sin proyecto</option>
+                {projects.map(project => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
-                    Proyecto (opcional)
-                  </label>
-                  <select
-                    value={selectedProject || ''}
-                    onChange={(e) => {
-                      setSelectedProject(e.target.value ? parseInt(e.target.value) : null);
-                      setSelectedTask(null);
-                    }}
-                    className="w-full px-4 py-2 border border-apple-gray-300 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-apple-blue-500 focus:border-transparent bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100"
-                  >
-                    <option value="">Sin proyecto</option>
-                    {projects.map(project => (
-                      <option key={project.id} value={project.id}>
-                        {project.name}
+            {selectedProject && (
+              <div>
+                <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
+                  Tarea (opcional)
+                </label>
+                <select
+                  value={selectedTask || ''}
+                  onChange={(e) => setSelectedTask(e.target.value ? parseInt(e.target.value) : null)}
+                  className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all"
+                >
+                  <option value="">Sin tarea</option>
+                  {tasks
+                    .filter(t => t.project?.id === selectedProject)
+                    .map(task => (
+                      <option key={task.id} value={task.id}>
+                        {task.title}
                       </option>
                     ))}
-                  </select>
-                </div>
-
-                {selectedProject && (
-                  <div>
-                    <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
-                      Tarea (opcional)
-                    </label>
-                    <select
-                      value={selectedTask || ''}
-                      onChange={(e) => setSelectedTask(e.target.value ? parseInt(e.target.value) : null)}
-                      className="w-full px-4 py-2 border border-apple-gray-300 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-apple-blue-500 focus:border-transparent bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100"
-                    >
-                      <option value="">Sin tarea</option>
-                      {tasks
-                        .filter(t => t.project?.id === selectedProject)
-                        .map(task => (
-                          <option key={task.id} value={task.id}>
-                            {task.title}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                )}
+                </select>
               </div>
+            )}
 
-              <div className="flex justify-end gap-3 mt-6">
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setShowModal(false);
-                    setNewPageTitle('');
-                    setSelectedProject(null);
-                    setSelectedTask(null);
-                  }}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={handleCreatePage}
-                >
-                  Crear Página
-                </Button>
-              </div>
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowModal(false);
+                  setNewPageTitle('');
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                }}
+                className="p-3 rounded-apple bg-apple-gray-900 hover:bg-apple-gray-800 dark:bg-apple-gray-800 dark:hover:bg-apple-gray-700 text-white transition-all"
+                title="Cancelar"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <Button
+                type="submit"
+                variant="primary"
+                icon={<Save className="w-4 h-4" />}
+                title="Crear página"
+              />
             </div>
-          </div>
-        )}
+          </form>
+        </Modal>
       </div>
     </PageTransition>
   );

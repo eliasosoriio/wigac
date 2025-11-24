@@ -27,6 +27,18 @@ interface WikiPage {
   };
 }
 
+interface Project {
+  id: number;
+  name: string;
+  tasks?: Task[];
+}
+
+interface Task {
+  id: number;
+  title: string;
+  projectId: number;
+}
+
 const WikiEditor = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -34,6 +46,9 @@ const WikiEditor = () => {
   const [page, setPage] = useState<WikiPage | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [syncScroll, setSyncScroll] = useState(true);
@@ -45,6 +60,7 @@ const WikiEditor = () => {
   useEffect(() => {
     if (id) {
       fetchPage();
+      fetchProjects();
     }
 
     // Cleanup al desmontar
@@ -160,12 +176,25 @@ const WikiEditor = () => {
       setPage(response.data);
       setTitle(response.data.title);
       setContent(response.data.content);
+      setSelectedProjectId(response.data.projectId || null);
+      setSelectedTaskId(response.data.taskId || null);
     } catch (error) {
       console.error('Error fetching page:', error);
       toast.error('Error al cargar la página');
       navigate('/wiki');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/projects`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setProjects(response.data);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
     }
   };
 
@@ -179,7 +208,12 @@ const WikiEditor = () => {
     try {
       await axios.put(
         `${API_URL}/wiki/${id}`,
-        { title, content },
+        {
+          title,
+          content,
+          projectId: selectedProjectId,
+          taskId: selectedTaskId
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success('Cambios guardados');
@@ -235,6 +269,55 @@ const WikiEditor = () => {
               className="text-3xl font-semibold bg-transparent border-none focus:outline-none focus:ring-0 p-0 text-apple-gray-900 dark:text-apple-gray-100 w-full"
               placeholder="Título del documento"
             />
+
+            {/* Selectores de Proyecto y Tarea */}
+            <div className="mt-4 flex flex-wrap gap-3">
+              <div className="flex-1 min-w-[200px]">
+                <label className="block text-xs font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-1">
+                  Proyecto
+                </label>
+                <select
+                  value={selectedProjectId || ''}
+                  onChange={(e) => {
+                    const projectId = e.target.value ? parseInt(e.target.value) : null;
+                    setSelectedProjectId(projectId);
+                    // Reset task if changing project
+                    if (projectId !== selectedProjectId) {
+                      setSelectedTaskId(null);
+                    }
+                  }}
+                  className="w-full px-3 py-2 text-sm border border-apple-gray-300 dark:border-dark-border rounded-apple bg-white dark:bg-dark-card text-apple-gray-900 dark:text-apple-gray-100 focus:ring-2 focus:ring-apple-orange-500 focus:border-transparent"
+                >
+                  <option value="">Sin proyecto</option>
+                  {projects.map((project) => (
+                    <option key={project.id} value={project.id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex-1 min-w-[200px]">
+                <label className="block text-xs font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-1">
+                  Tarea
+                </label>
+                <select
+                  value={selectedTaskId || ''}
+                  onChange={(e) => setSelectedTaskId(e.target.value ? parseInt(e.target.value) : null)}
+                  disabled={!selectedProjectId}
+                  className="w-full px-3 py-2 text-sm border border-apple-gray-300 dark:border-dark-border rounded-apple bg-white dark:bg-dark-card text-apple-gray-900 dark:text-apple-gray-100 focus:ring-2 focus:ring-apple-orange-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <option value="">Sin tarea</option>
+                  {selectedProjectId && projects
+                    .find((p) => p.id === selectedProjectId)
+                    ?.tasks?.map((task) => (
+                      <option key={task.id} value={task.id}>
+                        {task.title}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            </div>
           </div>
           <Button
             variant="primary"

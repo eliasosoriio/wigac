@@ -50,6 +50,8 @@ const Wiki = () => {
   const [loading, setLoading] = useState(true);
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingPage, setEditingPage] = useState<WikiPage | null>(null);
   const [expandedTasks, setExpandedTasks] = useState<Set<number>>(new Set());
   const [newPageTitle, setNewPageTitle] = useState('');
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
@@ -204,6 +206,45 @@ const Wiki = () => {
     }
   };
 
+  const handleEditPage = (page: WikiPage, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingPage(page);
+    setNewPageTitle(page.title);
+    setSelectedProject(page.projectId || null);
+    setSelectedTask(page.taskId || null);
+    setShowEditModal(true);
+  };
+
+  const handleUpdatePage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPageTitle.trim() || !editingPage) {
+      toast.error('El título es requerido');
+      return;
+    }
+
+    try {
+      await axios.put(
+        `${API_URL}/wiki/${editingPage.id}`,
+        {
+          title: newPageTitle,
+          projectId: selectedProject,
+          taskId: selectedTask
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success('Página actualizada');
+      setShowEditModal(false);
+      setEditingPage(null);
+      setNewPageTitle('');
+      setSelectedProject(null);
+      setSelectedTask(null);
+      fetchData();
+    } catch (error) {
+      console.error('Error updating page:', error);
+      toast.error('Error al actualizar página');
+    }
+  };
+
   const renderTree = (nodes: TreeNode[], level = 0) => {
     return nodes.map(node => (
       <div key={node.id} style={{ marginLeft: `${level * 20}px` }}>
@@ -301,10 +342,7 @@ const Wiki = () => {
                 </span>
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/wiki/${page.id}`);
-                    }}
+                    onClick={(e) => handleEditPage(page, e)}
                     className="p-1 hover:bg-apple-gray-200 dark:hover:bg-dark-card text-apple-gray-600 dark:text-apple-gray-400 rounded transition-colors"
                     title="Editar"
                   >
@@ -539,6 +577,94 @@ const Wiki = () => {
                 variant="primary"
                 icon={<Save className="w-4 h-4" />}
                 title="Crear página"
+              />
+            </div>
+          </form>
+        </Modal>
+
+        {/* Modal de Edición */}
+        <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="Editar página">
+          <form onSubmit={handleUpdatePage} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
+                Título de la página
+              </label>
+              <input
+                type="text"
+                value={newPageTitle}
+                onChange={(e) => setNewPageTitle(e.target.value)}
+                className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-orange-500 dark:focus:border-apple-orange-400 focus:ring-2 focus:ring-apple-orange-100 dark:focus:ring-apple-orange-900/30 transition-all"
+                placeholder="Ej: Documentación del proyecto"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
+                Proyecto (opcional)
+              </label>
+              <select
+                value={selectedProject || ''}
+                onChange={(e) => {
+                  const projectId = e.target.value ? parseInt(e.target.value) : null;
+                  setSelectedProject(projectId);
+                  if (selectedTask && tasks.find(t => t.id === selectedTask)?.project?.id !== projectId) {
+                    setSelectedTask(null);
+                  }
+                }}
+                className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-orange-500 dark:focus:border-apple-orange-400 focus:ring-2 focus:ring-apple-orange-100 dark:focus:ring-apple-orange-900/30 transition-all"
+              >
+                <option value="">Sin proyecto</option>
+                {projects.map(project => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {selectedProject && (
+              <div>
+                <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
+                  Tarea (opcional)
+                </label>
+                <select
+                  value={selectedTask || ''}
+                  onChange={(e) => setSelectedTask(e.target.value ? parseInt(e.target.value) : null)}
+                  className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-orange-500 dark:focus:border-apple-orange-400 focus:ring-2 focus:ring-apple-orange-100 dark:focus:ring-apple-orange-900/30 transition-all"
+                >
+                  <option value="">Sin tarea</option>
+                  {tasks
+                    .filter(t => t.project?.id === selectedProject)
+                    .map(task => (
+                      <option key={task.id} value={task.id}>
+                        {task.title}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditingPage(null);
+                  setNewPageTitle('');
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                }}
+                className="p-3 rounded-apple bg-apple-gray-900 hover:bg-apple-gray-800 dark:bg-apple-gray-800 dark:hover:bg-apple-gray-700 text-white transition-all"
+                title="Cancelar"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <Button
+                type="submit"
+                variant="primary"
+                icon={<Save className="w-4 h-4" />}
+                title="Actualizar página"
               />
             </div>
           </form>

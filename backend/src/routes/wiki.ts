@@ -95,7 +95,7 @@ router.put('/:id', async (req, res) => {
   try {
     const { wikiPages: wikiRepository } = getRepositories();
     const { id } = req.params;
-    const { title, content } = req.body;
+    const { title, content, projectId, taskId } = req.body;
 
     const page = await wikiRepository.findOne({ where: { id: parseInt(id) } });
     if (!page) {
@@ -107,9 +107,18 @@ router.put('/:id', async (req, res) => {
       page.slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
     }
     if (content !== undefined) page.content = content;
+    if (projectId !== undefined) page.projectId = projectId ? parseInt(projectId) : undefined;
+    if (taskId !== undefined) page.taskId = taskId ? parseInt(taskId) : undefined;
 
     await wikiRepository.save(page);
-    res.json(page);
+
+    // Recargar con relaciones
+    const updatedPage = await wikiRepository.findOne({
+      where: { id: parseInt(id) },
+      relations: ['project', 'task']
+    });
+
+    res.json(updatedPage);
   } catch (error) {
     console.error('Update wiki page error:', error);
     res.status(500).json({ message: 'Internal server error' });

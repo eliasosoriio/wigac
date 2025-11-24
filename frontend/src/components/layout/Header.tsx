@@ -1,4 +1,4 @@
-import { BellDot, Search, Moon, Sun, DownloadCloud, FolderKanban, CheckSquare, Clock, X } from 'lucide-react';
+import { BellDot, Search, Moon, Sun, DownloadCloud, FolderKanban, CheckSquare, Clock, X, FileText } from 'lucide-react';
 import { Input } from '../ui';
 import { useThemeStore } from '../../store/themeStore';
 import { useAuthStore } from '../../store/authStore';
@@ -12,10 +12,11 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
 interface SearchResult {
   id: number;
   title: string;
-  type: 'project' | 'task' | 'subtask';
+  type: 'project' | 'task' | 'subtask' | 'wiki';
   description?: string;
   projectId?: number;
   projectTitle?: string;
+  content?: string;
 }
 
 const Header = () => {
@@ -61,7 +62,7 @@ const Header = () => {
 
     setSearching(true);
     try {
-      const [projectsRes, tasksRes, subtasksRes] = await Promise.all([
+      const [projectsRes, tasksRes, subtasksRes, wikiRes] = await Promise.all([
         axios.get(`${API_URL}/projects`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
@@ -69,6 +70,9 @@ const Header = () => {
           headers: { Authorization: `Bearer ${token}` }
         }),
         axios.get(`${API_URL}/subtasks`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get(`${API_URL}/wiki`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -128,6 +132,24 @@ const Header = () => {
         }
       });
 
+      // Search in wiki pages
+      wikiRes.data.forEach((page: any) => {
+        if (
+          page.title?.toLowerCase().includes(queryLower) ||
+          page.content?.toLowerCase().includes(queryLower)
+        ) {
+          const project = page.projectId ? projectsRes.data.find((p: any) => p.id === page.projectId) : null;
+          results.push({
+            id: page.id,
+            title: page.title,
+            type: 'wiki',
+            content: page.content?.substring(0, 100),
+            projectId: page.projectId,
+            projectTitle: project?.title
+          });
+        }
+      });
+
       setSearchResults(results.slice(0, 10)); // Limit to 10 results
       setShowResults(results.length > 0);
     } catch (error) {
@@ -149,6 +171,8 @@ const Header = () => {
       }
     } else if (result.type === 'subtask') {
       navigate('/diary');
+    } else if (result.type === 'wiki') {
+      navigate(`/wiki/${result.id}`);
     }
   };
 
@@ -166,6 +190,8 @@ const Header = () => {
         return <CheckSquare className="w-4 h-4" />;
       case 'subtask':
         return <Clock className="w-4 h-4" />;
+      case 'wiki':
+        return <FileText className="w-4 h-4" />;
       default:
         return <Search className="w-4 h-4" />;
     }
@@ -179,6 +205,8 @@ const Header = () => {
         return 'Tarea';
       case 'subtask':
         return 'Registro';
+      case 'wiki':
+        return 'Wiki';
       default:
         return '';
     }
@@ -247,7 +275,7 @@ const Header = () => {
           <div className="relative">
             <Input
               type="search"
-              placeholder="Buscar proyectos, tareas..."
+              placeholder="Buscar proyectos, tareas, documentos..."
               icon={<Search className="w-5 h-5" />}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -296,6 +324,11 @@ const Header = () => {
                         {result.description && (
                           <p className="text-xs text-apple-gray-500 dark:text-apple-gray-400 truncate mt-1">
                             {result.description}
+                          </p>
+                        )}
+                        {result.content && !result.description && (
+                          <p className="text-xs text-apple-gray-500 dark:text-apple-gray-400 truncate mt-1">
+                            {result.content}...
                           </p>
                         )}
                         {result.projectTitle && (

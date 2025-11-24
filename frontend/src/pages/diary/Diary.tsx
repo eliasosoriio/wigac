@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Calendar, ChevronDown, ChevronUp, Mail, Plus, Pencil, Trash2 } from 'lucide-react';
 import { Card, CardBody } from '../../components/ui';
+import { Modal } from '../../components/ui/Modal';
 import { SubtaskModal } from '../../components/diary/SubtaskModal';
 import { ExportMenu } from '../../components/tasks/ExportMenu';
+import PageTransition from '../../components/animations/PageTransition';
 import { useAuthStore } from '../../store/authStore';
 import { useSubtaskModalStore } from '../../store/subtaskModalStore';
 import axios from 'axios';
@@ -42,6 +44,8 @@ const Diary = () => {
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [showEmailPreview, setShowEmailPreview] = useState(false);
+  const [emailData, setEmailData] = useState({ to: '', subject: '', body: '' });
 
   useEffect(() => {
     fetchSubtasks();
@@ -242,11 +246,15 @@ const Diary = () => {
     const userName = user?.name || 'Usuario';
     const subject = `Sdweb - Interno - Parte trabajo - ${userName} - ${formattedDate}`;
 
-    // Crear el mailto link para Thunderbird
-    const mailtoLink = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    // Guardar datos del correo y mostrar modal
+    setEmailData({ to, subject, body });
+    setShowEmailPreview(true);
+  };
 
-    // Abrir Thunderbird
+  const handleSendEmail = () => {
+    const mailtoLink = `mailto:${encodeURIComponent(emailData.to)}?subject=${encodeURIComponent(emailData.subject)}&body=${encodeURIComponent(emailData.body)}`;
     window.location.href = mailtoLink;
+    setShowEmailPreview(false);
     toast.success('Abriendo cliente de correo...');
   };
 
@@ -359,8 +367,10 @@ const Diary = () => {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <>
+      <PageTransition>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-white">Registros</h1>
           <p className="text-apple-gray-600 dark:text-apple-gray-400 mt-2">
@@ -541,6 +551,8 @@ const Diary = () => {
             })}
           </div>
         )}
+        </div>
+      </PageTransition>
 
       {/* Modal para crear subtarea */}
       <SubtaskModal
@@ -550,7 +562,60 @@ const Diary = () => {
         selectedDate={selectedDate}
         token={token || ''}
       />
-    </div>
+
+      {/* Modal de Preview del Correo */}
+      <Modal
+        isOpen={showEmailPreview}
+        onClose={() => setShowEmailPreview(false)}
+        title="Preview del Correo"
+        size="xl"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
+              Para:
+            </label>
+            <div className="px-4 py-3 bg-apple-gray-50 dark:bg-dark-hover rounded-lg text-sm text-apple-gray-900 dark:text-apple-gray-100">
+              {emailData.to}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
+              Asunto:
+            </label>
+            <div className="px-4 py-3 bg-apple-gray-50 dark:bg-dark-hover rounded-lg text-sm text-apple-gray-900 dark:text-apple-gray-100 font-medium">
+              {emailData.subject}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
+              Mensaje:
+            </label>
+            <div className="px-4 py-3 bg-apple-gray-50 dark:bg-dark-hover rounded-lg text-sm text-apple-gray-900 dark:text-apple-gray-100 whitespace-pre-wrap font-mono max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-apple-gray-300 dark:scrollbar-thumb-dark-border scrollbar-track-transparent">
+              {emailData.body}
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              onClick={() => setShowEmailPreview(false)}
+              className="flex-1 px-4 py-3 rounded-apple bg-apple-gray-200 hover:bg-apple-gray-300 dark:bg-dark-hover dark:hover:bg-dark-card text-apple-gray-700 dark:text-apple-gray-300 font-medium transition-all"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleSendEmail}
+              className="flex-1 px-4 py-3 rounded-apple bg-apple-orange-500 hover:bg-apple-orange-600 text-white font-medium transition-all shadow-apple inline-flex items-center justify-center"
+            >
+              <Mail className="w-4 h-4 mr-2" />
+              Enviar Correo
+            </button>
+          </div>
+        </div>
+      </Modal>
+    </>
   );
 };
 

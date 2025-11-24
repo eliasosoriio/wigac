@@ -31,7 +31,7 @@ const TasksLayout = () => {
                     group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-all
                     ${
                       isActive
-                        ? 'border-apple-blue-500 text-apple-blue-600 dark:text-apple-blue-400'
+                        ? 'border-apple-orange-500 text-apple-orange-600 dark:text-apple-orange-400'
                         : 'border-transparent text-apple-gray-500 dark:text-apple-gray-400 hover:text-apple-gray-700 dark:hover:text-apple-gray-300 hover:border-apple-gray-300 dark:hover:border-apple-gray-600'
                     }
                   `}

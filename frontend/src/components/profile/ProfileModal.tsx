@@ -112,7 +112,7 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Avatar */}
         <div className="flex justify-center mb-6">
-          <div className="w-24 h-24 rounded-full bg-apple-blue-500 flex items-center justify-center text-white text-3xl font-semibold shadow-apple">
+          <div className="w-24 h-24 rounded-full bg-apple-orange-500 flex items-center justify-center text-white text-3xl font-semibold shadow-apple">
             {user?.name.charAt(0).toUpperCase()}
           </div>
         </div>
@@ -120,7 +120,7 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
         {/* Información básica */}
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-apple-gray-700 mb-2">
+            <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
               <User className="w-4 h-4 inline mr-2" />
               Nombre
             </label>
@@ -134,7 +134,7 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-apple-gray-700 mb-2">
+            <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
               <Mail className="w-4 h-4 inline mr-2" />
               Correo Electrónico
             </label>
@@ -149,8 +149,8 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
         </div>
 
         {/* Cambiar contraseña */}
-        <div className="pt-4 border-t border-apple-gray-200">
-          <h4 className="text-sm font-semibold text-apple-gray-900 mb-3 flex items-center">
+        <div className="pt-4 border-t border-apple-gray-200 dark:border-dark-border">
+          <h4 className="text-sm font-semibold text-apple-gray-900 dark:text-apple-gray-100 mb-3 flex items-center">
             <Lock className="w-4 h-4 mr-2" />
             Cambiar Contraseña (opcional)
           </h4>
@@ -194,16 +194,15 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
 
         {/* Botones */}
         <div className="flex gap-3 pt-4">
-          <Button
+          <button
             type="button"
-            variant="secondary"
             onClick={onClose}
             disabled={loading}
-            className="flex-1"
+            className="flex-1 inline-flex items-center justify-center px-4 py-3 rounded-apple bg-apple-gray-200 hover:bg-apple-gray-300 dark:bg-dark-hover dark:hover:bg-dark-card text-apple-gray-700 dark:text-apple-gray-300 font-medium transition-all disabled:opacity-50"
           >
             <X className="w-4 h-4 mr-2" />
             Cancelar
-          </Button>
+          </button>
           <Button
             type="submit"
             disabled={loading}

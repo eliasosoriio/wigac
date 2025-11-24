@@ -49,6 +49,17 @@ const Dashboard = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [notes]);
 
+  // Auto-guardar cada 30 segundos si hay cambios
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (notes) {
+        saveNotes(true); // true = guardado silencioso
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [notes]);
+
   const fetchDashboardData = async () => {
     try {
       const [projectsRes, tasksRes, subtasksRes] = await Promise.all([
@@ -121,27 +132,44 @@ const Dashboard = () => {
     }
   };
 
-  const loadNotes = () => {
-    const savedNotes = localStorage.getItem('dashboard-notes');
-    if (savedNotes) {
-      setNotes(savedNotes);
-      const savedDate = localStorage.getItem('dashboard-notes-date');
-      if (savedDate) {
-        setLastSaved(new Date(savedDate));
+  const loadNotes = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/quicknotes`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotes(response.data.content || '');
+      setLastSaved(new Date(response.data.updatedAt));
+    } catch (error) {
+      console.error('Error loading notes:', error);
+      // Si falla, intentar cargar desde localStorage como fallback
+      const savedNotes = localStorage.getItem('dashboard-notes');
+      if (savedNotes) {
+        setNotes(savedNotes);
       }
     }
   };
 
-  const saveNotes = () => {
+  const saveNotes = async (silent = false) => {
     setSaving(true);
     try {
-      localStorage.setItem('dashboard-notes', notes);
-      const now = new Date();
-      localStorage.setItem('dashboard-notes-date', now.toISOString());
+      const response = await axios.put(
+        `${API_URL}/quicknotes`,
+        { content: notes },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const now = new Date(response.data.updatedAt);
       setLastSaved(now);
-      toast.success('Notas guardadas');
+      // Sincronizar con localStorage también
+      localStorage.setItem('dashboard-notes', notes);
+      localStorage.setItem('dashboard-notes-date', now.toISOString());
+      if (!silent) {
+        toast.success('Notas guardadas');
+      }
     } catch (error) {
-      toast.error('Error al guardar notas');
+      console.error('Error saving notes:', error);
+      if (!silent) {
+        toast.error('Error al guardar notas');
+      }
     } finally {
       setSaving(false);
     }
@@ -254,7 +282,7 @@ const Dashboard = () => {
                     </span>
                   )}
                   <button
-                    onClick={saveNotes}
+                    onClick={() => saveNotes(false)}
                     disabled={saving}
                     className="p-2 bg-apple-orange-500 hover:bg-apple-orange-600 text-white rounded-lg transition-colors disabled:opacity-50"
                     title={saving ? 'Guardando...' : 'Guardar notas'}
@@ -264,7 +292,7 @@ const Dashboard = () => {
                 </div>
               </div>
               <p className="text-xs text-apple-gray-500 dark:text-apple-gray-400 mt-1">
-                Presiona Ctrl+S o Cmd+S para guardar rápidamente
+                Ctrl+S o Cmd+S para guardar • Auto-guardado cada 30 seg
               </p>
             </CardHeader>
             <CardBody>

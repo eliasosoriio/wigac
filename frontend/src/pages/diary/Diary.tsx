@@ -413,7 +413,7 @@ const Diary = () => {
                       onClick={() => toggleDate(date)}
                       className="flex items-center gap-4 flex-1 hover:opacity-80 transition-opacity"
                     >
-                      <Calendar className="w-5 h-5 text-apple-blue dark:text-blue-400" />
+                      <Calendar className="w-5 h-5 text-apple-orange-500 dark:text-apple-orange-400" />
                       <div className="text-left">
                         <h3 className="text-lg font-semibold text-apple-gray-900 dark:text-white capitalize">
                           {dateLabel}

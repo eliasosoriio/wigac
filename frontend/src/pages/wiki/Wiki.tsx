@@ -263,9 +263,9 @@ const Wiki = () => {
           )}
 
           {node.type === 'project' ? (
-            <FolderKanban className="w-4 h-4 text-apple-blue-500" />
+            <FolderKanban className="w-4 h-4 text-apple-orange-500" />
           ) : node.type === 'task' ? (
-            <CheckSquare className="w-4 h-4 text-orange-500" />
+            <CheckSquare className="w-4 h-4 text-apple-orange-500" />
           ) : (
             <FileText className="w-4 h-4 text-apple-gray-500" />
           )}
@@ -465,7 +465,7 @@ const Wiki = () => {
                               e.stopPropagation();
                               navigate(`/wiki/${page.id}`);
                             }}
-                            className="p-2 hover:bg-apple-blue-100 dark:hover:bg-apple-blue-900/30 text-apple-blue-600 dark:text-apple-blue-400 rounded transition-colors"
+                            className="p-2 hover:bg-apple-orange-100 dark:hover:bg-apple-orange-900/30 text-apple-orange-600 dark:text-apple-orange-400 rounded transition-colors"
                             title="Editar"
                           >
                             <Edit2 className="w-4 h-4" />

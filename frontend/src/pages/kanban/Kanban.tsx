@@ -215,9 +215,9 @@ const KanbanColumn = ({ title, status, tasks, count }: KanbanColumnProps) => {
   };
 
   return (
-    <div ref={setNodeRef}>
-      <Card className={`min-h-[600px] border-t-4 ${columnColors[status]} dark:bg-dark-card`}>
-        <CardHeader className={`${headerColors[status]} rounded-t-xl`}>
+    <div ref={setNodeRef} className="flex flex-col h-[calc(100vh-280px)]">
+      <Card className={`flex flex-col h-full border-t-4 ${columnColors[status]} dark:bg-dark-card`}>
+        <CardHeader className={`${headerColors[status]} rounded-t-xl flex-shrink-0`}>
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">{title}</h3>
             <span className="px-2 py-1 rounded-full bg-white/50 dark:bg-black/20 text-xs font-medium">
@@ -225,7 +225,7 @@ const KanbanColumn = ({ title, status, tasks, count }: KanbanColumnProps) => {
             </span>
           </div>
         </CardHeader>
-        <CardBody className="space-y-3 p-4">
+        <CardBody className="space-y-3 p-4 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-apple-gray-300 dark:scrollbar-thumb-dark-border scrollbar-track-transparent hover:scrollbar-thumb-apple-gray-400 dark:hover:scrollbar-thumb-apple-gray-600">
           <SortableContext items={tasks.map(t => t.id.toString())} strategy={verticalListSortingStrategy}>
             {tasks.length === 0 ? (
               <div className="text-sm text-apple-gray-400 dark:text-apple-gray-500 text-center py-8">

@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, OneToOne } from 'typeorm';
 import { Project } from './Project';
 import { Task } from './Task';
 import { Activity } from './Activity';
+import { QuickNote } from './QuickNote';
 
 export enum Role {
   USER = 'USER',
@@ -40,4 +41,7 @@ export class User {
 
   @OneToMany(() => Activity, (activity) => activity.user)
   activities!: Activity[];
+
+  @OneToOne(() => QuickNote, (quickNote) => quickNote.user)
+  quickNote?: QuickNote;
 }

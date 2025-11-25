@@ -14,6 +14,7 @@ import wikiRoutes from './routes/wiki';
 import reportsRoutes from './routes/reports';
 import backupRoutes from './routes/backup';
 import quickNotesRoutes from './routes/quicknotes';
+import regacRoutes from './routes/regac';
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.use('/api/wiki', wikiRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/backup', backupRoutes);
 app.use('/api/quicknotes', quickNotesRoutes);
+app.use('/api/regac', regacRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

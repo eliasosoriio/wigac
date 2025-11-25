@@ -6,6 +6,7 @@ import { Activity } from './entities/Activity';
 import { WikiPage } from './entities/WikiPage';
 import { Subtask } from './entities/Subtask';
 import { QuickNote } from './entities/QuickNote';
+import { RegacLog } from './entities/RegacLog';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -16,7 +17,7 @@ export const AppDataSource = new DataSource({
   database: process.env.POSTGRES_DB || 'wigac_db',
   synchronize: true, // Auto-create tables (disable in production)
   logging: false,
-  entities: [User, Project, Task, Activity, WikiPage, Subtask, QuickNote],
+  entities: [User, Project, Task, Activity, WikiPage, Subtask, QuickNote, RegacLog],
   migrations: [],
   subscribers: [],
 });

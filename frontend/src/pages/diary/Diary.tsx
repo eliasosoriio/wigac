@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, ChevronDown, ChevronUp, Mail, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Calendar, ChevronDown, ChevronUp, Mail, Plus, Pencil, Trash2, CheckCircle2, Circle } from 'lucide-react';
 import { Card, CardBody } from '../../components/ui';
 import { Modal } from '../../components/ui/Modal';
 import { SubtaskModal } from '../../components/diary/SubtaskModal';
@@ -46,6 +46,7 @@ const Diary = () => {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [showEmailPreview, setShowEmailPreview] = useState(false);
   const [emailData, setEmailData] = useState({ to: '', subject: '', body: '' });
+  const [regacLogs, setRegacLogs] = useState<{ [date: string]: boolean }>({});
 
   useEffect(() => {
     fetchSubtasks();
@@ -74,11 +75,55 @@ const Diary = () => {
       const uniqueDates = [...new Set(response.data.map((st: Subtask) => st.workDate))] as string[];
       const recentDates = uniqueDates.slice(0, 3);
       setExpandedDates(new Set(recentDates));
+
+      // Cargar estados de regac para todas las fechas
+      if (uniqueDates.length > 0) {
+        fetchRegacLogs(uniqueDates, currentToken);
+      }
     } catch (error: any) {
       console.error('Error fetching subtasks:', error);
       toast.error('Error al cargar el diario');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRegacLogs = async (dates: string[], currentToken: string) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/regac/batch`,
+        { dates },
+        { headers: { Authorization: `Bearer ${currentToken}` } }
+      );
+      setRegacLogs(response.data);
+    } catch (error) {
+      console.error('Error fetching regac logs:', error);
+    }
+  };
+
+  const toggleRegacLog = async (date: string) => {
+    const currentStatus = regacLogs[date] || false;
+    const newStatus = !currentStatus;
+
+    // Optimistic update
+    setRegacLogs(prev => ({ ...prev, [date]: newStatus }));
+
+    try {
+      const authData = localStorage.getItem('auth-storage');
+      const currentToken = token || (authData ? JSON.parse(authData).state?.token : null);
+
+      await axios.put(
+        `${API_URL}/regac/${date}`,
+        { registered: newStatus },
+        { headers: { Authorization: `Bearer ${currentToken}` } }
+      );
+
+      toast.success(newStatus ? 'Marcado como registrado en Regac' : 'Desmarcado de Regac');
+    } catch (error) {
+      console.error('Error updating regac log:', error);
+      toast.error('Error al actualizar el estado de Regac');
+      // Revert on error
+      setRegacLogs(prev => ({ ...prev, [date]: currentStatus }));
     }
   };
 
@@ -435,6 +480,25 @@ const Diary = () => {
                     </button>
 
                     <div className="flex items-center gap-3">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleRegacLog(date);
+                        }}
+                        className={`p-2.5 rounded-apple transition-all ${
+                          regacLogs[date]
+                            ? 'bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-900/50 text-green-600 dark:text-green-400'
+                            : 'bg-apple-gray-100 hover:bg-apple-gray-200 dark:bg-dark-hover dark:hover:bg-dark-card text-apple-gray-700 dark:text-apple-gray-300'
+                        }`}
+                        title={regacLogs[date] ? "Registrado en Regac" : "No registrado en Regac"}
+                      >
+                        {regacLogs[date] ? (
+                          <CheckCircle2 className="w-4 h-4" />
+                        ) : (
+                          <Circle className="w-4 h-4" />
+                        )}
+                      </button>
+
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

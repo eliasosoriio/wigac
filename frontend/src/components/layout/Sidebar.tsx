@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   CheckSquare,
   Columns,
+  MapPin,
   BookText,
   LogOut
 } from 'lucide-react';
@@ -21,6 +22,7 @@ const Sidebar = ({ onOpenProfile }: SidebarProps) => {
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
     { icon: CheckSquare, label: 'Registros', path: '/tasks' },
     { icon: Columns, label: 'Kanban', path: '/kanban' },
+    { icon: MapPin, label: 'Mapa', path: '/map' },
     { icon: BookText, label: 'Wiki', path: '/wiki' },
   ];
 

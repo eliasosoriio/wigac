@@ -36,6 +36,7 @@ export const TaskModal = ({ isOpen, onClose, onSuccess, task }: TaskModalProps) 
     title: '',
     description: '',
     status: 'PENDING',
+    priority: 'MEDIUM',
     projectId: ''
   });
 
@@ -51,6 +52,7 @@ export const TaskModal = ({ isOpen, onClose, onSuccess, task }: TaskModalProps) 
         title: task.title,
         description: task.description,
         status: task.status,
+        priority: (task as any).priority || 'MEDIUM',
         projectId: task.projectId ? String(task.projectId) : ''
       });
     } else {
@@ -58,6 +60,7 @@ export const TaskModal = ({ isOpen, onClose, onSuccess, task }: TaskModalProps) 
         title: '',
         description: '',
         status: 'PENDING',
+        priority: 'MEDIUM',
         projectId: ''
       });
     }
@@ -149,7 +152,7 @@ export const TaskModal = ({ isOpen, onClose, onSuccess, task }: TaskModalProps) 
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
               Proyecto
@@ -166,6 +169,23 @@ export const TaskModal = ({ isOpen, onClose, onSuccess, task }: TaskModalProps) 
                   {project.name}
                 </option>
               ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300 mb-2">
+              Prioridad
+            </label>
+            <select
+              value={formData.priority}
+              onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+              className="w-full px-4 py-3 rounded-apple border border-apple-gray-300 dark:border-dark-border bg-white dark:bg-dark-hover text-apple-gray-900 dark:text-apple-gray-100 focus:border-apple-blue-500 dark:focus:border-apple-blue-400 focus:ring-2 focus:ring-apple-blue-100 dark:focus:ring-apple-blue-900/30 transition-all"
+              disabled={loading}
+            >
+              <option value="LOW">Baja</option>
+              <option value="MEDIUM">Normal</option>
+              <option value="HIGH">Alta</option>
+              <option value="CRITICAL">Crítica</option>
             </select>
           </div>
 

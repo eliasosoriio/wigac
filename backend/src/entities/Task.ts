@@ -15,6 +15,7 @@ export enum TaskPriority {
   LOW = 'LOW',
   MEDIUM = 'MEDIUM',
   HIGH = 'HIGH',
+  CRITICAL = 'CRITICAL',
 }
 
 @Entity('tasks')
@@ -62,6 +63,12 @@ export class Task {
 
   @Column({ type: 'int', nullable: true })
   timeSpentMinutes?: number;
+
+  @Column({ type: 'float', nullable: true, default: null })
+  mapPositionX?: number;
+
+  @Column({ type: 'float', nullable: true, default: null })
+  mapPositionY?: number;
 
   @ManyToOne(() => Project, (project) => project.tasks, { nullable: true })
   @JoinColumn({ name: 'projectId' })

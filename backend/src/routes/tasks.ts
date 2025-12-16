@@ -217,6 +217,33 @@ router.patch('/:id/status', async (req: AuthRequest, res) => {
   }
 });
 
+// Update task map position
+router.patch('/:id/position', async (req: AuthRequest, res) => {
+  try {
+    const { tasks: taskRepository } = getRepositories();
+    const { id } = req.params;
+    const { mapPositionX, mapPositionY } = req.body;
+    const userId = req.user!.id;
+
+    const task = await taskRepository.findOne({
+      where: { id: parseInt(id), assignedUserId: userId }
+    });
+
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    task.mapPositionX = mapPositionX;
+    task.mapPositionY = mapPositionY;
+    await taskRepository.save(task);
+
+    res.json(task);
+  } catch (error) {
+    console.error('Update task position error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 // Delete task
 router.delete('/:id', async (req: AuthRequest, res) => {
   try {

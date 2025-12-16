@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import ProjectDetail from './pages/projects/ProjectDetail';
 import TasksLayout from './pages/tasks/TasksLayout';
 import Kanban from './pages/kanban/Kanban';
+import Map from './pages/map/Map';
 import Wiki from './pages/wiki/Wiki';
 import WikiEditor from './pages/wiki/WikiEditor';
 
@@ -26,6 +27,7 @@ function AppRoutes() {
           <Route path="projects/:id" element={<ProjectDetail />} />
           <Route path="tasks" element={<TasksLayout />} />
           <Route path="kanban" element={<Kanban />} />
+          <Route path="map" element={<Map />} />
           <Route path="wiki" element={<Wiki />} />
           <Route path="wiki/:id" element={<WikiEditor />} />
         </Route>

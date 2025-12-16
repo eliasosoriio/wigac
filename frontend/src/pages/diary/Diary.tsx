@@ -304,40 +304,58 @@ const Diary = () => {
   };
 
   const handleExportDailyReport = async (date: Date) => {
-    // Convertir subtasks al formato que espera generateDailyReport
-    const tasksForReport = subtasks.map(st => ({
-      id: st.task.id,
-      title: st.task.title,
-      description: st.description || st.task.title,
-      status: st.task.status,
-      workDate: st.workDate,
-      startTime: st.startTime,
-      endTime: st.endTime,
-      timeSpentMinutes: 0, // No usado por generateDailyReport
-      project: st.task.project,
-      subtasks: []
-    }));
+    // Agrupar subtasks por tarea
+    const taskMap = new Map();
+    subtasks.forEach(st => {
+      if (!taskMap.has(st.task.id)) {
+        taskMap.set(st.task.id, {
+          id: st.task.id,
+          title: st.task.title,
+          status: st.task.status,
+          project: st.task.project,
+          subtasks: []
+        });
+      }
+      taskMap.get(st.task.id).subtasks.push({
+        id: st.id,
+        description: st.description,
+        workDate: st.workDate,
+        startTime: st.startTime,
+        endTime: st.endTime,
+        status: st.task.status
+      });
+    });
 
+    const tasksForReport = Array.from(taskMap.values());
     const report = generateDailyReport(tasksForReport, date);
-    const filename = `${format(date, 'yyyyMMdd')}_registros.txt`;
+    const filename = `${format(date, 'yyyyMMdd')}_tareas.txt`;
     downloadReport(report, filename);
     toast.success('Reporte descargado');
   };
 
   const handleCopyDailyReport = async (date: Date) => {
-    const tasksForReport = subtasks.map(st => ({
-      id: st.task.id,
-      title: st.task.title,
-      description: st.description || st.task.title,
-      status: st.task.status,
-      workDate: st.workDate,
-      startTime: st.startTime,
-      endTime: st.endTime,
-      timeSpentMinutes: 0,
-      project: st.task.project,
-      subtasks: []
-    }));
+    const taskMap = new Map();
+    subtasks.forEach(st => {
+      if (!taskMap.has(st.task.id)) {
+        taskMap.set(st.task.id, {
+          id: st.task.id,
+          title: st.task.title,
+          status: st.task.status,
+          project: st.task.project,
+          subtasks: []
+        });
+      }
+      taskMap.get(st.task.id).subtasks.push({
+        id: st.id,
+        description: st.description,
+        workDate: st.workDate,
+        startTime: st.startTime,
+        endTime: st.endTime,
+        status: st.task.status
+      });
+    });
 
+    const tasksForReport = Array.from(taskMap.values());
     const report = generateDailyReport(tasksForReport, date);
     const success = await copyToClipboard(report);
     if (success) {
@@ -348,19 +366,28 @@ const Diary = () => {
   };
 
   const handleExportProgressReport = async (date: Date) => {
-    const tasksForReport = subtasks.map(st => ({
-      id: st.task.id,
-      title: st.task.title,
-      description: st.description || st.task.title,
-      status: st.task.status,
-      workDate: st.workDate,
-      startTime: st.startTime,
-      endTime: st.endTime,
-      timeSpentMinutes: 0,
-      project: st.task.project,
-      subtasks: []
-    }));
+    const taskMap = new Map();
+    subtasks.forEach(st => {
+      if (!taskMap.has(st.task.id)) {
+        taskMap.set(st.task.id, {
+          id: st.task.id,
+          title: st.task.title,
+          status: st.task.status,
+          project: st.task.project,
+          subtasks: []
+        });
+      }
+      taskMap.get(st.task.id).subtasks.push({
+        id: st.id,
+        description: st.description,
+        workDate: st.workDate,
+        startTime: st.startTime,
+        endTime: st.endTime,
+        status: st.task.status
+      });
+    });
 
+    const tasksForReport = Array.from(taskMap.values());
     const report = generateProgressReport(tasksForReport, date);
     const filename = `${format(date, 'yyyyMMdd')}_informe.txt`;
     downloadReport(report, filename);
@@ -368,19 +395,28 @@ const Diary = () => {
   };
 
   const handleCopyProgressReport = async (date: Date) => {
-    const tasksForReport = subtasks.map(st => ({
-      id: st.task.id,
-      title: st.task.title,
-      description: st.description || st.task.title,
-      status: st.task.status,
-      workDate: st.workDate,
-      startTime: st.startTime,
-      endTime: st.endTime,
-      timeSpentMinutes: 0,
-      project: st.task.project,
-      subtasks: []
-    }));
+    const taskMap = new Map();
+    subtasks.forEach(st => {
+      if (!taskMap.has(st.task.id)) {
+        taskMap.set(st.task.id, {
+          id: st.task.id,
+          title: st.task.title,
+          status: st.task.status,
+          project: st.task.project,
+          subtasks: []
+        });
+      }
+      taskMap.get(st.task.id).subtasks.push({
+        id: st.id,
+        description: st.description,
+        workDate: st.workDate,
+        startTime: st.startTime,
+        endTime: st.endTime,
+        status: st.task.status
+      });
+    });
 
+    const tasksForReport = Array.from(taskMap.values());
     const report = generateProgressReport(tasksForReport, date);
     const success = await copyToClipboard(report);
     if (success) {

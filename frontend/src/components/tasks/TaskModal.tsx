@@ -89,8 +89,12 @@ export const TaskModal = ({ isOpen, onClose, onSuccess, task }: TaskModalProps) 
         headers: { Authorization: `Bearer ${currentToken}` }
       };
 
+      // Si el estado es TRANSVERSAL, guardamos como COMPLETED
+      const finalStatus = formData.status === 'TRANSVERSAL' ? 'COMPLETED' : formData.status;
+
       const payload = {
         ...formData,
+        status: finalStatus,
         projectId: formData.projectId ? parseInt(formData.projectId) : null
       };
 

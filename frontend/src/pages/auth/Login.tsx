@@ -41,14 +41,14 @@ const Login = () => {
 
   return (
     <PageTransition>
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-apple-gray-50 to-apple-blue-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-apple-gray-50 to-apple-blue-50 dark:from-dark-bg dark:to-dark-hover p-4">
       <Card className="w-full max-w-md">
         <CardBody className="p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-semibold text-apple-gray-900 mb-2">
+            <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-apple-gray-100 mb-2">
               Wigac
             </h1>
-            <p className="text-apple-gray-600">
+            <p className="text-apple-gray-600 dark:text-apple-gray-400">
               Inicia sesión en tu cuenta
             </p>
           </div>
@@ -86,11 +86,11 @@ const Login = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-apple-gray-600 text-sm">
+            <p className="text-apple-gray-600 dark:text-apple-gray-400 text-sm">
               ¿No tienes cuenta?{' '}
               <Link
                 to="/register"
-                className="text-apple-blue-600 hover:text-apple-blue-700 font-medium transition-colors"
+                className="text-apple-blue-600 dark:text-apple-blue-400 hover:text-apple-blue-700 dark:hover:text-apple-blue-300 font-medium transition-colors"
               >
                 Regístrate aquí
               </Link>

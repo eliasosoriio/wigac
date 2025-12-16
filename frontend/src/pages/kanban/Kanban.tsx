@@ -25,6 +25,7 @@ interface Task {
   title: string;
   description: string;
   status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'TRANSVERSAL';
+  updatedAt: string;
   project?: {
     id: number;
     name: string;
@@ -268,7 +269,24 @@ const Kanban = () => {
         headers: { Authorization: `Bearer ${currentToken}` }
       });
 
-      setTasks(response.data);
+      // Filtrar tareas transversales y tareas completadas hace más de 7 días
+      const now = new Date();
+      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+      const filteredTasks = response.data.filter((task: Task) => {
+        // Excluir tareas transversales
+        if (task.status === 'TRANSVERSAL') return false;
+
+        // Excluir tareas completadas hace más de 7 días
+        if (task.status === 'COMPLETED') {
+          const updatedAt = new Date(task.updatedAt);
+          if (updatedAt < oneWeekAgo) return false;
+        }
+
+        return true;
+      });
+
+      setTasks(filteredTasks);
     } catch (error: any) {
       console.error('Error fetching tasks:', error);
       toast.error('Error al cargar las tareas');
@@ -316,9 +334,12 @@ const Kanban = () => {
       const authData = localStorage.getItem('auth-storage');
       const currentToken = token || (authData ? JSON.parse(authData).state?.token : null);
 
+      // Si el nuevo estado es TRANSVERSAL, automáticamente marcamos como COMPLETED
+      const finalStatus = newStatus === 'TRANSVERSAL' ? 'COMPLETED' : newStatus;
+
       await axios.patch(
         `${API_URL}/tasks/${taskId}/status`,
-        { status: newStatus },
+        { status: finalStatus },
         { headers: { Authorization: `Bearer ${currentToken}` } }
       );
 

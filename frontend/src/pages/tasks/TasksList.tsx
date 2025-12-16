@@ -145,9 +145,12 @@ const Tasks = () => {
       const authData = localStorage.getItem('auth-storage');
       const currentToken = token || (authData ? JSON.parse(authData).state?.token : null);
 
+      // Si el nuevo estado es TRANSVERSAL, automáticamente marcamos como COMPLETED
+      const finalStatus = newStatus === 'TRANSVERSAL' ? 'COMPLETED' : newStatus;
+
       await axios.patch(
         `${API_URL}/tasks/${taskId}/status`,
-        { status: newStatus },
+        { status: finalStatus },
         { headers: { Authorization: `Bearer ${currentToken}` } }
       );
       fetchTasks();

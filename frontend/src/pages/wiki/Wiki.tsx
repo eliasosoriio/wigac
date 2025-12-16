@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FileText, FolderKanban, ChevronRight, ChevronDown, Trash2, Edit2, CheckSquare, X, Save, ChevronUp } from 'lucide-react';
+import { Plus, FileText, FolderKanban, ChevronRight, ChevronDown, Trash2, Edit2, CheckSquare, X, Save } from 'lucide-react';
 import { Card, CardBody } from '../../components/ui';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui';
@@ -52,7 +52,6 @@ const Wiki = () => {
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingPage, setEditingPage] = useState<WikiPage | null>(null);
-  const [expandedTasks, setExpandedTasks] = useState<Set<number>>(new Set());
   const [newPageTitle, setNewPageTitle] = useState('');
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
   const [selectedTask, setSelectedTask] = useState<number | null>(null);
@@ -148,18 +147,6 @@ const Wiki = () => {
     setTreeData(updateTree(treeData));
   };
 
-  const toggleTaskPages = (taskId: number) => {
-    setExpandedTasks(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(taskId)) {
-        newSet.delete(taskId);
-      } else {
-        newSet.add(taskId);
-      }
-      return newSet;
-    });
-  };
-
   const handleCreatePage = async () => {
     if (!newPageTitle.trim()) {
       toast.error('El título es requerido');
@@ -247,12 +234,25 @@ const Wiki = () => {
 
   const renderTree = (nodes: TreeNode[], level = 0) => {
     return nodes.map(node => (
-      <div key={node.id} style={{ marginLeft: `${level * 20}px` }}>
-        <div className="flex items-center gap-2 py-2 px-3 hover:bg-apple-gray-100 dark:hover:bg-dark-hover rounded-lg transition-colors group">
-          {(node.type === 'project' || node.type === 'task') && (node.tasks?.length || 0) > 0 && (
+      <div key={node.id} style={{ marginLeft: `${level * 16}px` }}>
+        <div className="flex items-center gap-2 py-1.5 px-2 hover:bg-apple-gray-100 dark:hover:bg-dark-hover rounded-lg transition-colors group">
+          {node.type === 'project' && (node.tasks?.length || 0) > 0 && (
             <button
               onClick={() => toggleNode(node.id)}
-              className="p-1 hover:bg-apple-gray-200 dark:hover:bg-dark-border rounded"
+              className="p-0.5 hover:bg-apple-gray-200 dark:hover:bg-dark-border rounded"
+            >
+              {node.expanded ? (
+                <ChevronDown className="w-4 h-4 text-apple-gray-500" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-apple-gray-500" />
+              )}
+            </button>
+          )}
+
+          {node.type === 'task' && node.pages && node.pages.length > 0 && (
+            <button
+              onClick={() => toggleNode(node.id)}
+              className="p-0.5 hover:bg-apple-gray-200 dark:hover:bg-dark-border rounded"
             >
               {node.expanded ? (
                 <ChevronDown className="w-4 h-4 text-apple-gray-500" />
@@ -263,68 +263,53 @@ const Wiki = () => {
           )}
 
           {node.type === 'project' ? (
-            <FolderKanban className="w-4 h-4 text-apple-orange-500" />
+            <FolderKanban className="w-4 h-4 text-apple-orange-500 flex-shrink-0" />
           ) : node.type === 'task' ? (
-            <CheckSquare className="w-4 h-4 text-apple-orange-500" />
+            <CheckSquare className="w-4 h-4 text-apple-orange-500 flex-shrink-0" />
           ) : (
-            <FileText className="w-4 h-4 text-apple-gray-500" />
+            <FileText className="w-4 h-4 text-apple-orange-500 flex-shrink-0" />
           )}
 
           <span className="flex-1 text-sm font-medium text-apple-gray-700 dark:text-apple-gray-300">
             {node.name}
+            {node.type === 'task' && node.pages && node.pages.length > 0 && (
+              <span className="ml-1.5 text-xs text-apple-gray-500 dark:text-apple-gray-400 font-normal">
+                ({node.pages.length})
+              </span>
+            )}
           </span>
         </div>
 
-        {node.pages && node.pages.length > 0 && node.type === 'task' && (
-          <div style={{ marginLeft: '20px' }}>
-            <button
-              onClick={() => toggleTaskPages(node.taskId!)}
-              className="flex items-center gap-2 py-1.5 px-3 mb-1 hover:bg-apple-gray-100 dark:hover:bg-dark-hover rounded-lg transition-colors w-full text-left"
-            >
-              {expandedTasks.has(node.taskId!) ? (
-                <ChevronUp className="w-3.5 h-3.5 text-apple-gray-500" />
-              ) : (
-                <ChevronDown className="w-3.5 h-3.5 text-apple-gray-500" />
-              )}
-              <span className="text-xs font-medium text-apple-gray-600 dark:text-apple-gray-400">
-                Páginas ({node.pages.length})
-              </span>
-            </button>
-            {expandedTasks.has(node.taskId!) && (
-              <div className="space-y-0.5">
-                {node.pages.map(page => (
-                  <div
-                    key={page.id}
-                    className="flex items-center gap-2 py-2 px-3 hover:bg-apple-gray-100 dark:hover:bg-dark-hover rounded-lg transition-colors cursor-pointer group"
-                    onClick={() => navigate(`/wiki/${page.id}`)}
+        {node.pages && node.pages.length > 0 && node.type === 'task' && node.expanded && (
+          <div style={{ marginLeft: '24px' }} className="space-y-0.5 mt-1">
+            {node.pages.map(page => (
+              <div
+                key={page.id}
+                className="flex items-center gap-2 py-1.5 px-2 hover:bg-apple-gray-100 dark:hover:bg-dark-hover rounded-lg transition-colors cursor-pointer group"
+                onClick={() => navigate(`/wiki/${page.id}`)}
+              >
+                <FileText className="w-3.5 h-3.5 text-apple-gray-400 dark:text-apple-gray-500 flex-shrink-0" />
+                <span className="flex-1 text-xs text-apple-gray-600 dark:text-apple-gray-400">
+                  {page.title}
+                </span>
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={(e) => handleEditPage(page, e)}
+                    className="p-1 hover:bg-apple-gray-200 dark:hover:bg-dark-card text-apple-gray-600 dark:text-apple-gray-400 rounded transition-colors"
+                    title="Editar"
                   >
-                    <FileText className="w-4 h-4 text-apple-gray-400 dark:text-apple-gray-500" />
-                    <span className="flex-1 text-sm text-apple-gray-600 dark:text-apple-gray-400">
-                      {page.title}
-                    </span>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/wiki/${page.id}`);
-                        }}
-                        className="p-1 hover:bg-apple-gray-200 dark:hover:bg-dark-card text-apple-gray-600 dark:text-apple-gray-400 rounded transition-colors"
-                        title="Editar"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={(e) => handleDeletePage(page.id, e)}
-                        className="p-1 hover:bg-apple-gray-200 dark:hover:bg-dark-card text-apple-gray-600 dark:text-apple-gray-400 rounded transition-colors"
-                        title="Eliminar"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                    <Edit2 className="w-3 h-3" />
+                  </button>
+                  <button
+                    onClick={(e) => handleDeletePage(page.id, e)}
+                    className="p-1 hover:bg-apple-gray-200 dark:hover:bg-dark-card text-apple-gray-600 dark:text-apple-gray-400 rounded transition-colors"
+                    title="Eliminar"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
-            )}
+            ))}
           </div>
         )}
 

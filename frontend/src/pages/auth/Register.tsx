@@ -71,14 +71,14 @@ const Register = () => {
 
   return (
     <PageTransition>
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-apple-gray-50 to-apple-blue-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-apple-gray-50 to-apple-blue-50 dark:from-dark-bg dark:to-dark-hover p-4">
       <Card className="w-full max-w-md">
         <CardBody className="p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-semibold text-apple-gray-900 mb-2">
+            <h1 className="text-3xl font-semibold text-apple-gray-900 dark:text-apple-gray-100 mb-2">
               Wigac
             </h1>
-            <p className="text-apple-gray-600">
+            <p className="text-apple-gray-600 dark:text-apple-gray-400">
               Crea tu cuenta
             </p>
           </div>
@@ -138,7 +138,7 @@ const Register = () => {
           <div className="mt-6 text-center">
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 text-apple-blue-600 hover:text-apple-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 text-apple-blue-600 dark:text-apple-blue-400 hover:text-apple-blue-700 dark:hover:text-apple-blue-300 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Volver al inicio de sesión</span>

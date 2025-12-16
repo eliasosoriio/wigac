@@ -1,6 +1,5 @@
-import { BellDot, Search, Moon, Sun, DownloadCloud, FolderKanban, CheckSquare, Clock, X, FileText } from 'lucide-react';
+import { BellDot, Search, DownloadCloud, FolderKanban, CheckSquare, Clock, X, FileText } from 'lucide-react';
 import { Input } from '../ui';
-import { useThemeStore } from '../../store/themeStore';
 import { useAuthStore } from '../../store/authStore';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -20,7 +19,6 @@ interface SearchResult {
 }
 
 const Header = () => {
-  const { isDarkMode, toggleTheme } = useThemeStore();
   const { token } = useAuthStore();
   const navigate = useNavigate();
   const [downloading, setDownloading] = useState(false);
@@ -354,17 +352,6 @@ const Header = () => {
             title="Descargar backup de la base de datos"
           >
             <DownloadCloud className={`w-5 h-5 text-apple-gray-700 dark:text-apple-gray-300 ${downloading ? 'animate-pulse' : ''}`} />
-          </button>
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-full hover:bg-apple-gray-100 dark:hover:bg-dark-hover transition-colors"
-            title={isDarkMode ? 'Modo claro' : 'Modo oscuro'}
-          >
-            {isDarkMode ? (
-              <Sun className="w-5 h-5 text-yellow-500" />
-            ) : (
-              <Moon className="w-5 h-5 text-apple-gray-700" />
-            )}
           </button>
           <button className="p-2 rounded-full hover:bg-apple-gray-100 dark:hover:bg-dark-hover transition-colors relative">
             <BellDot className="w-5 h-5 text-apple-gray-700 dark:text-apple-gray-300" />

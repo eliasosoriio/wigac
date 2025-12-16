@@ -5,6 +5,9 @@ import { Toaster } from 'react-hot-toast';
 import App from './App';
 import './index.css';
 
+// Force dark mode on load
+document.documentElement.classList.add('dark');
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
